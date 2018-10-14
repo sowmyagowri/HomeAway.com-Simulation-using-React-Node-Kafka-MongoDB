@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { userConstants } from '../constants';
 
 //Reducer listening to different action types

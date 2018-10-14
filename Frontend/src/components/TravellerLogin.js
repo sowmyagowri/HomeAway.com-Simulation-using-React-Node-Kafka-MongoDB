@@ -49,9 +49,9 @@ class TravellerLogin extends Component{
                 password : password
             }
             this.props.travellerlogin(data).then(response => {
-                if(response.status===200){
+                if(response.payload.status === 200){
                     this.setState({
-                    message: ""
+                        message: ""
                     });
                 }
             }).catch (error => {
@@ -64,8 +64,9 @@ class TravellerLogin extends Component{
     }
 
     render(){
-        //redirect based on successful login
+        
         const { email, password, submitted, message } = this.state;
+        //redirect based on successful login
         let redirectVar = null;
         console.log("Cookie is", cookie.load('cookie1'));
         if(cookie.load('cookie1')){

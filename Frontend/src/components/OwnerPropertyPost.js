@@ -284,7 +284,7 @@ render(){
 
   let redirectVar = null;
   console.log(cookie.load('cookie1'))
-  if(cookie.load('cookie1') != 'ownercookie'){
+  if(cookie.load('cookie1') !== 'ownercookie'){
     redirectVar = <Redirect to = "/owner/login"/>
   }
   if(this.state.posted){

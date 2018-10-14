@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import cookie from 'react-cookies';
-import {Redirect} from 'react-router';
 import {Navbar} from "react-bootstrap";
 import './home.css';
 import Background from './homepage_background.png'
@@ -137,15 +136,12 @@ class Home extends Component {
   }
 
   render(){
-    let redirectVar = null;
     if(cookie.load('cookie1')){
       this.state.isTravelerLoggedIn = true
-    } else {
-      redirectVar = <Redirect to = "/"/>
     }
+
     return(
       <div style={{height:"800px", backgroundImage: this.state.backgroundImage}}>
-      {redirectVar}
         <Navbar style = {{backgroundColor: "transparent", background: "transparent", borderColor: "transparent"}}>
           <Navbar.Header>
             <Navbar.Brand>

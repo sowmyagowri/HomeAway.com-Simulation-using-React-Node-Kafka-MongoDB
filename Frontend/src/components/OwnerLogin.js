@@ -111,55 +111,55 @@ class OwnerLogin extends Component{
                     </Navbar.Header>
                     <img src={require('./logo.png')} alt="Homeaway Logo"/>
                 </Navbar>  
-                <div class="container">
+                <div className="container">
                 <p></p>
                 </div>
-                <div class="container">
+                <div className="container">
                 <p></p>
                 </div>
-                <div class="container">
+                <div className="container">
                 <p></p>
                 </div>
-                <div class="container">
+                <div className="container">
                 <p></p>
                 </div>
-                <div class="container">
+                <div className="container">
                 <p></p>
                 </div>
-                <div class="container">
+                <div className="container">
                 <p></p>
                 </div>
-                <div class="center">
+                <div className="center">
                     <div id="yourdiv">
-                        <h1 class="display-5">Log in to HomeAway</h1>
-                        <h2><small>Need an account? <a class="bg-default" href="/owner/signup1">Sign Up</a></small></h2>
+                        <h1 className="display-5">Log in to HomeAway</h1>
+                        <h2><small>Need an account? <a className="bg-default" href="/owner/signup1">Sign Up</a></small></h2>
                     </div>
                 </div>
-                <div class="container">
-                <div class="col-sm-6 col-sm-offset-6" style={{left: "400px"}}>
-                <div class="login-form">
+                <div className="container">
+                <div className="col-sm-6 col-sm-offset-6" style={{left: "400px"}}>
+                <div className="login-form">
                     <h2>Owner Account Login</h2>  
                     <hr width="98%"></hr>         
                     <br></br>
-                            <div class="form-group">
-                                <input onChange = {this.emailChangeHandler} type="text" class="form-control" name="email" placeholder="Email Address" required/>
+                            <div className="form-group">
+                                <input onChange = {this.emailChangeHandler} type="text" className="form-control" name="email" placeholder="Email Address" required/>
                             </div>
-                            <div class="form-group">
-                                <input onChange = {this.passwordChangeHandler} type="password" class="form-control" name="password" placeholder="Password" required/>
+                            <div className="form-group">
+                                <input onChange = {this.passwordChangeHandler} type="password" className="form-control" name="password" placeholder="Password" required/>
                             </div>
                             <button id="opener_guid" type="button">Forgot Password?</button>
                             <br></br>
                             <br></br>
                             <div>
-                            <button onClick = {this.submitLogin} class="btn btn-warning" style={{width:"100%"}} >Log In</button>
+                            <button onClick = {this.submitLogin} className="btn btn-warning" style={{width:"100%"}} >Log In</button>
                             </div>
                             <br></br>
-                            <div class="mydiv">
-                                <span class="myspan">or</span>
+                            <div className="mydiv">
+                                <span className="myspan">or</span>
                             </div>
                             <br></br>
                             <div>
-                                <button class="mybtn facebook_button">Log in with Facebook</button>
+                                <button className="mybtn facebook_button">Log in with Facebook</button>
                             </div>
                             <br></br>
                             <div>
@@ -173,7 +173,7 @@ class OwnerLogin extends Component{
                 </div>
                 </div>
                 <br></br>
-                <div class="center" id= "yourdiv">
+                <div className="center" id= "yourdiv">
                     <font size="1">Use of this Web site constitutes acceptance of the HomeAway.com Terms and Conditions and Privacy Policy.
                         <br></br>
                         ©2018 HomeAway. All rights reserved.</font>

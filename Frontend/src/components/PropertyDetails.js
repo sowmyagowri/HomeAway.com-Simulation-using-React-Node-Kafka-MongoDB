@@ -288,20 +288,20 @@ class PropertyDetails extends Component {
                             <Carousel autoPlay showThumbs={false}>
                             
                                 <div>
-                                    <img alt="Image 1" className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails[0].image1}`} />
+                                    <img className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails[0].image1}`} />
                                 </div>
                             
                              <div>
-                                    <img alt="Image 2" className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails[0].image2}`} />
+                                    <img className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails[0].image2}`} />
                                 </div>
                                 <div>
-                                    <img alt="Image 3" className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails[0].image3}`} />
+                                    <img className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails[0].image3}`} />
                                 </div>
                                 <div>
-                                    <img alt="Image 4" className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails[0].image4}`} />
+                                    <img className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails[0].image4}`} />
                                 </div>
                             <div>
-                                    <img alt="Image 5" className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails[0].image5}`} />
+                                    <img className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails[0].image5}`} />
                                 </div>
                             
                             </Carousel>

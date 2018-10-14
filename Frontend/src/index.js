@@ -11,8 +11,8 @@ import TravellerTripListings from './components/TravellerTripListings';
 import OwnerLogin from './components/OwnerLogin';
 import OwnerPropertyPost from './components/OwnerPropertyPost';
 import OwnerPropertyListings from './components/OwnerPropertyListings';
-import Signup1 from './components/Signup1';
-import Signup2 from './components/Signup2';
+import TravellerSignup1 from './components/TravellerSignup1';
+import TravellerSignup2 from './components/TravellerSignup2';
 import OwnerSignup1 from './components/OwnerSignup1';
 import OwnerSignup2 from './components/OwnerSignup2';
 
@@ -45,8 +45,8 @@ ReactDOM.render(
             )} />
             <Route path='/property/:id/:location/:fromdate/:todate/:noOfGuests' component={PropertyDetails} />
             <Route path='/traveller/login' component={TravellerLogin} />
-            <Route path='/traveller/signup1' component={Signup1} />
-            <Route path='/traveller/signup2' component={Signup2} />
+            <Route path='/traveller/signup1' component={TravellerSignup1} />
+            <Route path='/traveller/signup2' component={TravellerSignup2} />
             <Route path='/traveller/mytrips' component={TravellerTripListings} />
             <Route path='/Profile' component={Profile} />
             <Route path='/owner/login' component={OwnerLogin} />

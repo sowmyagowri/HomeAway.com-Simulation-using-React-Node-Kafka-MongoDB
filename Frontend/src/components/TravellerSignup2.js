@@ -1,22 +1,21 @@
 import React, {Component} from 'react';
 import cookie from 'react-cookies';
+import SweetAlert from 'react-bootstrap-sweetalert';
 import './OwnerLogin.css';
 import './bootstrap-social.css';
 import {Navbar} from "react-bootstrap";
 
-import { ownersignup } from '../actions';
+import { travellersignup } from '../actions';
 import { reduxForm } from "redux-form";
 import { connect } from 'react-redux';
 import validator from 'validator';
-import SweetAlert from 'react-bootstrap-sweetalert';
 
 //Define a Signup2 Component
-class OwnerSignup2 extends Component{
+class TravellerSignup2 extends Component{
     //call the constructor method
     constructor(props){
         //Call the constrictor of Super class i.e The Component
         super(props);
-        //maintain the state required for this component
         //maintain the state required for this component
         this.state = {
             firstname: { value: '', isValid: true, message: '' },
@@ -31,7 +30,7 @@ class OwnerSignup2 extends Component{
         this.handleValidation = this.handleValidation.bind(this);
         this.submitLogin = this.submitLogin.bind(this);
     }
-
+    
     //firstname ,lastname, email and password change handler to update state variable with the text entered by the user
     changeHandler = (e) => {
         const state = {
@@ -119,9 +118,10 @@ class OwnerSignup2 extends Component{
         return formIsValid;
    }
 
-   //submit Login handler to send a request to the node backend
+
+    //submit Login handler to send a request to the node backend
     submitLogin(event) {
-        console.log("Inside owner submit login");
+        console.log("Inside traveller submit login");
         //prevent page from refresh
         event.preventDefault();
         if(this.handleValidation()){
@@ -132,33 +132,20 @@ class OwnerSignup2 extends Component{
                 password : this.state.password.value
             }
             
-            this.props.ownersignup(data).then(response => {
+            this.props.travellersignup(data).then(response => {
 
                 if(response.payload.status === 200){
                     const getAlert = () => (
                         <SweetAlert 
                         success 
                         title = "Success!!"
-                        onConfirm={() => window.location = "/owner/propertypost"}>
-                        Owner profile created!
+                        onConfirm={() => window.location = "/"}>
+                        Traveller profile created!
                         </SweetAlert>
                     );
 
                     this.setState({
                         message: "",
-                        alert: getAlert(),
-                    });
-                } else if(response.payload.status === 201){
-                    const getAlert = () => (
-                        <SweetAlert 
-                        success 
-                        title = "Success!!"
-                        onConfirm={() => window.location = "/owner/propertypost"}>
-                        Owner profile has been added to Traveler login! You can now use the same login details
-                        </SweetAlert>
-                    );
-              
-                    this.setState({
                         alert: getAlert(),
                     });
                 }
@@ -215,7 +202,7 @@ class OwnerSignup2 extends Component{
                 <div className="center">
                     <div id="yourdiv">
                         <h1 className="display-5">Sign Up for HomeAway<br></br></h1>
-                        <h2><small>	Already have an Owner account? <a className="bg-default" href="/owner/login">Log in</a></small></h2>
+                        <h2><small>	Already have an account? <a className="bg-default" href="/traveller/login">Log in</a></small></h2>
                     </div>
                 </div>
                 <div className="container">
@@ -282,10 +269,10 @@ class OwnerSignup2 extends Component{
 }
 
 function mapStateToProps(state) {
-    return { ownersignup: state.ownersignup };
+    return { travellersignup: state.travellersignup };
 }
 
 //export Signup2 Component
 export default reduxForm({
-    form: "OwnerSignUpForm"
-  })(connect(mapStateToProps, {ownersignup}) (OwnerSignup2) );
+    form: "TravellerSignUpForm"
+  })(connect(mapStateToProps, {travellersignup}) (TravellerSignup2) );
