@@ -6,7 +6,8 @@ var app = express();
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var cors = require('cors');
-var pool = require('./src/models/UserDB.js');
+var mongoose = require('mongoose');
+var connStr = 'mongodb://localhost:27017/homeaway';
 
 //server configuration
 var basePath = '/homeaway';
@@ -31,17 +32,16 @@ app.use(function(req, res, next) {
   next();
 });
 
-pool.query('select * from users',  function(err, rows){
-  if(err) throw err;
+mongoose.connect(connStr, { useNewUrlParser: true }, function(err) {
+  if (err) throw err;
   else {
-    console.log("Connection to DB established");
+      console.log('Successfully connected to MongoDB');
   }
-});  
+});
 
 // Routes and Backend Funcioncalities
 var loginRoutes = require('./src/routes/loginRoutes');
 var propertyRoutes = require('./src/routes/propertyRoutes');
-var propertySearch = require('./src/routes/propertysearchwithoutpooling');
 
 app.use(express.static('public'));
 //use cors to allow cross origin resource sharing
@@ -50,7 +50,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(basePath, loginRoutes);
 app.use(basePath, propertyRoutes);
-app.use(basePath, propertySearch);
 app.use('/uploads', express.static(path.join(__dirname, '/uploads/')));
 
 
