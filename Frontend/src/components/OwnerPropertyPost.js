@@ -1,11 +1,14 @@
 import React, {Component} from 'react';
-import axios from 'axios';
 import cookie from 'react-cookies';
 import {Redirect} from 'react-router';
 import './OwnerPropertyPost.css';
 import {Navbar} from "react-bootstrap";
 import ReactDropzone from "react-dropzone";
 import SweetAlert from 'react-bootstrap-sweetalert';
+
+import { propertypost } from '../actions';
+import { reduxForm } from "redux-form";
+import { connect } from 'react-redux';
 
 const acceptedFileTypes = 'image/x-png, image/png, image/jpg, image/jpeg, image/gif'
 const acceptedFileTypesArray = acceptedFileTypes.split(",").map((item) => {return item.trim()})
@@ -156,6 +159,57 @@ handleValidation(){
  return formIsValid;
 }
 
+verifyFile = (files) => {
+  if (files){
+      const currentFile = files;
+      const currentFileType = currentFile.type
+      const currentFileSize = currentFile.size
+      if(currentFileSize > imageMaxSize) {
+          alert("This file is not allowed. " + currentFileSize + " bytes is too large")
+          return false
+      }
+      if (!acceptedFileTypesArray.includes(currentFileType)){
+          alert("This file is not allowed. Only images are allowed.")
+          return false
+      }
+      return true
+  }
+}
+
+onDrop = (selectedFiles, rejectedFiles) => {
+  let index;
+  for (index = 0; index < selectedFiles.length; ++index) {
+    const selectedfile = selectedFiles[index];
+    const rejectedfile = rejectedFiles[index];
+    if (rejectedfile){
+      this.verifyFile(rejectedfile)
+    }
+
+    if (selectedfile){
+      const isVerified = this.verifyFile(selectedfile)
+      if (isVerified){
+        if (this.state.previewuploadedPhotos.length < this.state.uploadedPhotoLimit){
+          this.setState(({ previewuploadedPhotos }) => ({
+            previewuploadedPhotos: previewuploadedPhotos.concat(selectedfile)
+          }))
+
+          console.log(this.state.selectedfile);
+
+          this.setState({
+           uploadedPhotos: this.state.uploadedPhotos.concat(selectedfile)
+          })
+
+          console.log(this.state.uploadedPhotos);
+
+        } else {
+          console.log(this.state.previewuploadedPhotos.length);
+          alert ("You can upload a maximum of 5 images only!")
+        }
+      }
+    }
+  }
+}
+
 submitListing = () => {
   console.log("In submit")
   if(this.handleValidation()){
@@ -208,76 +262,22 @@ addProperty = (e) => {
 
   Object.keys(data).forEach(function(key){
     formdata.append(key, data[key]);
-
   });
 
   // Display the key/value pairs
   for (var pair of formdata.entries()) {
     console.log(pair[0]+ ', ' + pair[1]); 
   }
-
-  axios.defaults.withCredentials = true;
-  axios.post('http://localhost:3001/homeaway/owner/listproperty', formdata)
+  this.props.propertypost(formdata, sessionStorage.getItem('jwtToken'))
     .then(response => {
-      if(response.data) {
+      if(response.payload.status === 200){
         console.log("Successful post property");
         this.setState ({posted: true})
       }
     })
     .catch(error => {
-      console.log("Post Property Server error")
+      console.log("Post Property Server error:", error);
   })
-}
-
-verifyFile = (files) => {
-  if (files){
-      const currentFile = files;
-      const currentFileType = currentFile.type
-      const currentFileSize = currentFile.size
-      if(currentFileSize > imageMaxSize) {
-          alert("This file is not allowed. " + currentFileSize + " bytes is too large")
-          return false
-      }
-      if (!acceptedFileTypesArray.includes(currentFileType)){
-          alert("This file is not allowed. Only images are allowed.")
-          return false
-      }
-      return true
-  }
-}
-
-onDrop = (selectedFiles, rejectedFiles) => {
-  let index;
-  for (index = 0; index < selectedFiles.length; ++index) {
-    const selectedfile = selectedFiles[index];
-    const rejectedfile = rejectedFiles[index];
-    if (rejectedfile){
-      this.verifyFile(rejectedfile)
-    }
-
-    if (selectedfile){
-      const isVerified = this.verifyFile(selectedfile)
-      if (isVerified){
-        if (this.state.previewuploadedPhotos.length < this.state.uploadedPhotoLimit){
-          this.setState(({ previewuploadedPhotos }) => ({
-            previewuploadedPhotos: previewuploadedPhotos.concat(selectedfile)
-          }))
-
-          console.log(this.state.selectedfile);
-
-          this.setState({
-           uploadedPhotos: this.state.uploadedPhotos.concat(selectedfile)
-          })
-
-          console.log(this.state.uploadedPhotos);
-
-        } else {
-          console.log(this.state.previewuploadedPhotos.length);
-          alert ("You can upload a maximum of 5 images only!")
-        }
-      }
-    }
-  }
 }
 
 render(){
@@ -301,15 +301,17 @@ render(){
             </Navbar.Brand>
           </Navbar.Header>
         <div>
-           <div className="btn btn-group">
-             <button className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {this.state.name}</button>
+           <div className="btn btn-group" id="white">
+             <button className="dropdown-toggle"  style = {{fontSize: "18px",  backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {this.state.name}</button>
              <div className="dropdown-menu">
-                <a className="dropdown-item" href="/Profile">Profile</a>
-                <a className="dropdown-item" href="/owner/mylistings">My Listings</a>
-                <a className="dropdown-item" onClick = {this.logout}>Logout</a>
+                <a className="dropdown-item" href="#"> <i class="fas fa-envelope"></i> Inbox</a>
+                <a className="dropdown-item" href="/owner/mylistings"> <i class="fas fa-home"></i> My Listings</a>
+                <a className="dropdown-item" href="/owner/propertypost"> <i class="far fa-building"></i> Post Property</a>
+                <a className="dropdown-item" href="/Profile"> <i class="fas fa-user"></i> My Profile</a>
+                <a className="dropdown-item" onClick = {this.logout}> <i class="fas fa-sign-out-alt"></i> Logout</a>
              </div>
            </div>
-           <img src={require('./logo.png')} alt="Homeaway Logo"/>
+           <img style={{marginLeft: "50px"}} src={require('./logo.png')} alt="Homeaway Logo"/>
         </div>
       </Navbar>
        <div className="container" style = {{fontFamily: "Lato,Arial,Helvetica Neue,sans-serif", marginTop : "50px"}}>
@@ -620,5 +622,11 @@ render(){
 
 }
 }
-//export Signup2 Component
-export default OwnerPropertyPost;
+
+function mapStateToProps(state) {
+  return { propertypost: state.propertypost };
+}
+
+export default reduxForm({
+  form: "OwnerPropertyPostForm"
+})(connect(mapStateToProps, {propertypost}) (OwnerPropertyPost) );

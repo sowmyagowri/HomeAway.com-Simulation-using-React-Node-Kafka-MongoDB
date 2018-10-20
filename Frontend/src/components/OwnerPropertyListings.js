@@ -38,11 +38,11 @@ class OwnerPropertyListings extends Component {
         console.log(data);
         axios.post('http://localhost:3001/homeaway/owner/propertylistings', data)
         .then(response => {
-            console.log("Status Code : ",response.status);
-            if(response.status === 200){
-                console.log(response.data)
+            console.log("Status Code : ", response.payload.status);
+            if(response.payload.status === 200){
+                console.log(response.payload.data)
                 this.setState({
-                    allListings : response.data,
+                    allListings : response.payload.data,
                     isLoading : false
                 });
             }

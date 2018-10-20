@@ -6,12 +6,31 @@ var app = express();
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var cors = require('cors');
+
+// Log requests to console
+var morgan = require('morgan');
+
+var config = require('./config/settings');
+var passport = require('passport');
+
+console.log("Initializing passport");
+app.use(passport.initialize());
+
+// Bring in defined Passport Strategy
+require('./config/passport').passport;
+
+// Set up Database connection
 var mongoose = require('mongoose');
-var connStr = 'mongodb://localhost:27017/homeaway';
+var connStr = config.database_type + '://' + config.database_host + ':' + config.database_port + '/' + config.database_name;
+mongoose.connect(connStr, { useNewUrlParser: true }, function(err) {
+  if (err) throw err;
+  else {
+      console.log('Successfully connected to MongoDB');
+  }
+});
 
 //server configuration
 var basePath = '/homeaway';
-var port = 3001;
 
 //use express session to maintain session data
 app.use(session({
@@ -27,33 +46,35 @@ app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT,DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
+  res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
   res.setHeader('Cache-Control', 'no-cache');
   next();
 });
 
-mongoose.connect(connStr, { useNewUrlParser: true }, function(err) {
-  if (err) throw err;
-  else {
-      console.log('Successfully connected to MongoDB');
-  }
-});
+// Log requests to console
+app.use(morgan('dev'));
 
 // Routes and Backend Funcioncalities
 var loginRoutes = require('./src/routes/loginRoutes');
-var propertyRoutes = require('./src/routes/propertyRoutes');
+//var propertyRoutes = require('./src/routes/propertyRoutes');
 
 app.use(express.static('public'));
+
 //use cors to allow cross origin resource sharing
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+
+// parse application/x-www-form-urlencoded
+// for easier testing with Postman or plain HTML forms
 app.use(bodyParser.urlencoded({extended: true}));
+
+// parse application/json
 app.use(bodyParser.json());
+
 app.use(basePath, loginRoutes);
-app.use(basePath, propertyRoutes);
+//app.use(basePath, propertyRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '/uploads/')));
 
-
 // Execute App
-app.listen(port, () => {
-  console.log('HomeAway Backend running on Port: ',port);
+app.listen(config.backend_port, () => {
+  console.log('HomeAway Backend running on Port:',config.backend_port);
 });

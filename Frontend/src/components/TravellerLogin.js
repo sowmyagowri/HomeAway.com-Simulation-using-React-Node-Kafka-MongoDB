@@ -37,11 +37,10 @@ class TravellerLogin extends Component{
 
     //submit Login handler to send a request to the node backend
     submitLogin(event) {
-        console.log("Inside submit login");
         //prevent page from refresh
         event.preventDefault();
         this.setState({ submitted: true });
-        console.log("Login Form submitted");
+        console.log("Traveller Login Form submitted");
         const { email, password } = this.state;
         if (email && password) {
             const data = {
@@ -53,6 +52,10 @@ class TravellerLogin extends Component{
                     this.setState({
                         message: ""
                     });
+                    //store JWT Token to browser session storage 
+                    //If you use localStorage instead of sessionStorage, then this will persist across tabs and new windows.
+                    //sessionStorage = persisted only in current tab
+                    sessionStorage.setItem('jwtToken', response.payload.data.token);
                 }
             }).catch (error => {
                 console.log("Error is", error);
@@ -69,7 +72,7 @@ class TravellerLogin extends Component{
         //redirect based on successful login
         let redirectVar = null;
         console.log("Cookie is", cookie.load('cookie1'));
-        if(cookie.load('cookie1')){
+        if(cookie.load('cookie1') === 'travellercookie'){
             redirectVar = <Redirect to= "/"/>
         }
         return(

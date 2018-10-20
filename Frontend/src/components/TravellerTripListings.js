@@ -35,13 +35,13 @@ class TravellerTripListings extends Component {
     }
         console.log("Calling Property Listings in Will Mount");
         console.log(data);
-        axios.post('http://localhost:3001/homeaway/traveller/triplistings', data)
+        this.props.travellertrips(data)
         .then(response => {
-            console.log("Status Code : ",response.status);
-            if(response.status === 200){
-                console.log(response.data)
+            console.log("Status Code : ", response.payload.status);
+            if(response.payload.status === 200){
+                console.log(response.payload.data)
                 this.setState({
-                    allTrips : response.data,
+                    allTrips : response.payload.data,
                     isLoading : false
                 });
             }

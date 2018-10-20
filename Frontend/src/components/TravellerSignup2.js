@@ -135,6 +135,11 @@ class TravellerSignup2 extends Component{
             this.props.travellersignup(data).then(response => {
 
                 if(response.payload.status === 200){
+                    //store JWT Token to browser session storage 
+                    //If you use localStorage instead of sessionStorage, then this will persist across tabs and new windows.
+                    //sessionStorage = persisted only in current tab
+                    sessionStorage.setItem('jwtToken', response.payload.data.token);
+                    
                     const getAlert = () => (
                         <SweetAlert 
                         success 

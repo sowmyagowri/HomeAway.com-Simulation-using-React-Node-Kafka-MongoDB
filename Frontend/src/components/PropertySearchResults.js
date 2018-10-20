@@ -1,11 +1,14 @@
 import React, {Component} from 'react';
 import 'typeface-roboto'
 import './PropertySearchResults.css';
-import axios from 'axios';
 import cookie from 'react-cookies';
 import {Navbar} from "react-bootstrap";
 import Helmet from 'react-helmet';
 import { Link } from 'react-router-dom';
+
+import { propertysearch } from '../actions';
+import { reduxForm } from "redux-form";
+import { connect } from 'react-redux';
 
 var longitude, lattitude, locationTitle;
 
@@ -56,13 +59,13 @@ class PropertySearchResults extends Component {
         }
         console.log("Calling Property Search in Will mount");
         console.log(data);
-        axios.post('http://localhost:3001/homeaway/property/search', data)
+        this.props.propertysearch(data, sessionStorage.getItem('jwtToken'))
         .then(response => {
-            console.log("Status Code : ",response.status);
-            if(response.status === 200){
-                console.log(response.data)
+            console.log("Status Code : ",response.payload.status);
+            if(response.payload.status === 200){
+                console.log(response.payload.data)
                 this.setState({
-                    searchData : response.data,
+                    searchData : response.payload.data,
                     isLoading : false,
                 });
             }
@@ -94,7 +97,7 @@ class PropertySearchResults extends Component {
                                 <br></br><br></br>
                                 <input style ={{background: "rgb(216, 245, 157)", width: "595px"}} id = "heading" value = {searchData[i].currency + ' ' + searchData[i].baseRate} type="text" readOnly="readOnly" />
 
-                                <Link className="view" to={`/property/${searchData[i].uid}/${this.state.location}/${this.state.fromdate}/${this.state.todate}/${this.state.noOfGuests}`} target="_blank">Dummy Link</Link>
+                                <Link className="view" to={`/property/${searchData[i]._id}/${this.state.location}/${this.state.fromdate}/${this.state.todate}/${this.state.noOfGuests}`} target="_blank">Dummy Link</Link>
                         </div>
                     </div>
         
@@ -199,16 +202,13 @@ class PropertySearchResults extends Component {
             noOfGuests : this.state.noOfGuests
             }
         
-            //set the with credentials to true
-            axios.defaults.withCredentials = true;
-            //make a post request with the user data
-            axios.post('http://localhost:3001/homeaway/property/search', data)
+            this.props.propertysearch(data, sessionStorage.getItem('jwtToken'))
                 .then(response => {
-                    console.log("Status Code : ",response.status);
-                    if(response.status === 200){
-                        console.log(response.data)
+                    console.log("Status Code : ", response.payload.status);
+                    if(response.payload.status === 200){
+                        console.log(response.payload.data)
                         this.setState({
-                            searchData : response.data,
+                            searchData : response.payload.data,
                             isLoading : false,
                        });
                     }
@@ -415,4 +415,10 @@ class Map extends Component {
     }
   }
 
-export default PropertySearchResults;
+  function mapStateToProps(state) {
+    return { propertysearch: state.propertysearch };
+  }
+  
+  export default reduxForm({
+    form: "OwnerPropertyPostForm"
+  })(connect(mapStateToProps, {propertysearch}) (PropertySearchResults) );

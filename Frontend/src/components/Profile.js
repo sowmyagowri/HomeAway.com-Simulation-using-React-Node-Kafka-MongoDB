@@ -47,7 +47,7 @@ class Profile extends Component{
             var input_email = cookie.load('cookie2');
             console.log(input_email);
             const data = { email : input_email }
-            this.props.profilefetch(data).then(response => {
+            this.props.profilefetch(data, sessionStorage.getItem('jwtToken')).then(response => {
                 if(response.payload.status === 200){
                     this.setState({ profiledata: response.payload.data });
                     this.refs.createdyear.value = this.state.profiledata.created;
@@ -179,11 +179,9 @@ class Profile extends Component{
             }
             
             console.log(data);
-            //set the with credentials to true
-            this.props.profilesave(data).then(response => {
-                console.log("Status Code : ", response.status);
+            this.props.profilesave(data, sessionStorage.getItem('jwtToken')).then(response => {
+                console.log("Status Code : ", response.payload.status);
                 if(response.payload.status === 200){
-                    console.log(response.payload.data)
                     this.setState({
                         profiledata: response.payload.data,
                         message: "Profile Data succesfully saved!"
@@ -222,33 +220,60 @@ class Profile extends Component{
                         {(cookie.load('cookie1') === 'travellercookie') 
                         ?
                         (
-                        <div className="btn btn-group">
-                            <button className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                        <div className="btn btn-group" id="white">
+                            <button className="dropdown-toggle"  style = {{fontSize: "18px",  backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
                             <div className="dropdown-menu">
-                                <a className="dropdown-item" href="/traveller/mytrips">My Trips</a>
-                                <a className="dropdown-item" href="/">Book My Trip</a>
-                                <a className="dropdown-item" href="#" onClick= {this.logout}>Logout</a>
+                                <a className="dropdown-item" href="#"> <i class="fas fa-envelope"></i> Inbox</a>
+                                <a className="dropdown-item" href="/traveller/mytrips"> <i class="fas fa-briefcase"></i> My Trips</a>
+                                <a className="dropdown-item" href="/Profile"> <i class="fas fa-user"></i> My Profile</a>
+                                <a className="dropdown-item" href="#" onClick= {this.logout}> <i class="fas fa-sign-out-alt"></i> Logout</a>
                             </div>
                         </div>
                         )
                         :
                         (
-                        <div className="btn btn-group">
+                        <div className="btn btn-group" id="white">
                             <button className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
                             <div className="dropdown-menu">
-                                <a className="dropdown-item" href="/owner/propertypost">Post Property</a>
-                                <a className="dropdown-item" href="/owner/mylistings">My Listings</a>
-                                <a className="dropdown-item" onClick = {this.logout}>Logout</a>
+                                <a className="dropdown-item" href="#"> <i class="fas fa-envelope"></i> Inbox</a>
+                                <a className="dropdown-item" href="/owner/mylistings"> <i class="fas fa-home"></i> My Listings</a>
+                                <a className="dropdown-item" href="/owner/propertypost"> <i class="far fa-building"></i> Post Property</a>
+                                <a className="dropdown-item" href="/Profile"> <i class="fas fa-user"></i> My Profile</a>
+                                <a className="dropdown-item" onClick = {this.logout}> <i class="fas fa-sign-out-alt"></i> Logout</a>
                             </div>
                         </div>
                         )
                     }
-                    <img src={require('./logo.png')} alt="Homeaway Logo"/>
+                    <img style={{marginLeft: "50px"}} src={require('./logo.png')} alt="Homeaway Logo"/>
                     </div>
                 </Navbar>
                 <div className="container">
                 <p></p>
                 </div>
+                {(cookie.load('cookie1') === 'travellercookie') 
+                ?
+                (
+                    <div id="conttab" class="container">
+                        <ul id="ulinktab">
+                            <li id="ulinktab" class="one"><a id="linktab" href="#"> <i class="fas fa-envelope"></i> Inbox</a></li>
+                            <li id="ulinktab" class="two"><a id="linktab" href="/traveller/mytrips"> <i class="fas fa-briefcase"></i> My Trips</a></li>
+                            <li id="ulinktab" class="three"><a id="linktab" href="/Profile"> <i class="fas fa-user"></i> My Profile</a></li>
+                            <hr id="hrtab" />
+                        </ul>
+                    </div>
+                )
+                :
+                (
+                    <div id="conttab" class="container">
+                        <ul id="ulinktab">
+                            <li id="ulinktab" class="one"><a id="linktab" href="#"> <i class="fas fa-envelope"></i> Inbox</a></li>
+                            <li id="ulinktab" class="two"><a id="linktab" href="/owner/mylistings"> <i class="fas fa-home"></i> My Listings</a></li>
+                            <li id="ulinktab" class="three"><a id="linktab" href="/Profile"> <i class="fas fa-user"></i> My Profile</a></li>
+                            <hr id="hrtab" />
+                        </ul>
+                    </div>
+                )
+                }
                 <div className="image "></div>
                 <div id = "profilehref" className="myprofilecontainer">
                     <div className="login-form">
@@ -265,7 +290,7 @@ class Profile extends Component{
                             <div className="help-block">{this.state.lastnameMessage}</div>
                         </div>
                         <div className="form-group">
-                            <input ref = "aboutMe" style={{height : "100px"}} onChange = {this.changeHandler} type="text" className="form-control input-lg" name="aboutMe" value={this.state.aboutMe} placeholder="About me"/>
+                            <textarea ref = "aboutMe" style={{height : "100px", cols:"40", rows: "5", }} onChange = {this.changeHandler} type="text" className="form-control input-lg" name="aboutMe" value={this.state.aboutMe} placeholder="About me"/>
                         </div>
                         <div className="form-group">
                             <input ref = "city" onChange = {this.changeHandler} type="text" className="form-control" name="city" value={this.state.city} placeholder="City"/>
@@ -330,22 +355,22 @@ class Profile extends Component{
                             </select><br/>
                             </div>
                             <div className="form-group">
-                                <input onChange = {this.changeHandler} ref = "country" value={this.state.profiledata.country} type="text" className="form-control" name="country" placeholder="Country"/>
+                                <input onChange = {this.changeHandler} ref = "country" value={this.state.country} type="text" className="form-control" name="country" placeholder="Country"/>
                             </div>
                             <div className="form-group">
-                                <input onChange = {this.changeHandler} ref = "company" value={this.state.profiledata.company} type="text" className="form-control" name="company" placeholder="Company"/>
+                                <input onChange = {this.changeHandler} ref = "company" value={this.state.company} type="text" className="form-control" name="company" placeholder="Company"/>
                             </div>
                             <div className="form-group">
-                                <input onChange = {this.changeHandler} ref = "school" value={this.state.profiledata.school} type="text" className="form-control" name="school" placeholder="School"/>
+                                <input onChange = {this.changeHandler} ref = "school" value={this.state.school} type="text" className="form-control" name="school" placeholder="School"/>
                             </div>
                             <div className="form-group">
-                                <input onChange = {this.changeHandler} ref = "hometown" value={this.state.profiledata.hometown} type="text" className="form-control" name="hometown" placeholder="Hometown"/>
+                                <input onChange = {this.changeHandler} ref = "hometown" value={this.state.hometown} type="text" className="form-control" name="hometown" placeholder="Hometown"/>
                             </div>
                             <div className="form-group">
-                                <input onChange = {this.changeHandler} ref = "languages" value={this.state.profiledata.languages} type="text" className="form-control" name="languages" placeholder="Languages"/>
+                                <input onChange = {this.changeHandler} ref = "languages" value={this.state.languages} type="text" className="form-control" name="languages" placeholder="Languages"/>
                             </div>
                             <div className="form-group">
-                            <select style={{width:"100%"}} ref = "gender" onChange={this.changeHandler} value={this.state.profiledata.gender} name="gender">
+                            <select style={{width:"100%"}} ref = "gender" onChange={this.changeHandler} value={this.state.gender} name="gender">
                                 <option style={{color: "#ccc",}} value="" hidden>Gender</option>
                                 <option name="male"> Male</option>
                                 <option name="female">Female</option>
@@ -354,7 +379,7 @@ class Profile extends Component{
                             <h6 align = "left"><small>This is never shared</small></h6>
                             </div>
                             <div className="form-group">
-                                <input onChange = {this.changeHandler} ref = "phone" value={this.state.profiledata.phone} type="text" className="form-control" name="phone" placeholder="Phone Number"/>
+                                <input onChange = {this.changeHandler} ref = "phone" value={this.state.phone} type="text" className="form-control" name="phone" placeholder="Phone Number"/>
                             </div>
                         </div>  
                         <br></br>

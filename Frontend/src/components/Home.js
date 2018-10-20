@@ -148,35 +148,41 @@ class Home extends Component {
               <a href="/" title = "HomeAway" className = "logo"><img alt="Homeaway White Logo" src={require('./homeaway_white.svg')}/></a>
             </Navbar.Brand>
           </Navbar.Header>
-          <div>
-            <img alt="US Flag" src={require('./us_flag.png')}/>
-            <button className="btn" style = {{fontColor : "#0067db", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button">Trip Boards</button>
+          <div class="box">
+            <div>
+              <img style={{marginTop: "13px"}} alt="US Flag" src={require('./us_flag.png')}/>
+            </div>
+            <button className="btn" id="white" style = {{fontColor : "#0067db", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button">Trip Boards</button>
             {console.log(this.state.isTravelerLoggedIn )}
             {!this.state.isTravelerLoggedIn 
               ?
               (
-                <div className="btn btn-group">
-                  <button id="white" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Login</button>
+                <div className="btn btn-group" id="white" >
+                  <button className="dropdown-toggle" style = {{color: "white", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Login</button>
                   <div className="dropdown-menu">
-                    <a className="dropdown-item" href="/traveller/login">Traveller Login</a>
+                    <a className="dropdown-item" href="/traveller/login">Traveler Login</a>
                     <a className="dropdown-item" href="/owner/login">Owner Login</a>
                   </div>
                 </div>
                 )
                 :
                 (
-                <div className="btn btn-group">
-                  <button id="white" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" href="/Profile">Profile</a>
-                    <a className="dropdown-item" href="/traveller/mytrips">My Trips</a>
-                    <a className="dropdown-item" href="#" onClick= {this.logout}>Logout</a>
+                <div>
+                  <div id="white" className="btn btn-group" style = {{marginRight: "160px", width: "50px", }}>
+                    <button className="dropdown-toggle" style = {{color: "white", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                    <div className="dropdown-menu">
+                      <a className="dropdown-item" href="/Profile"> <i class="fas fa-envelope"></i> Inbox</a>
+                      <a className="dropdown-item" href="/traveller/mytrips"> <i class="fas fa-briefcase"></i> My Trips</a>
+                      <a className="dropdown-item" href="/Profile"> <i class="fas fa-user"></i> My Profile</a>
+                      <a className="dropdown-item" href="#" onClick= {this.logout}> <i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
                   </div>
+                <img style = {{marginRight: "20px", }} alt="US Flag" src={require('./mailbox.png')}/>
                 </div>
                 )
              }
-              <button className="btn btn-group" style = {{color: "#fff", fontFamily: "Lato,Arial,Helvetica Neue,sans-serif", height: "40px", backgroundColor:"#fff", width: "200px", borderRadius: 25, borderColor: "#ffffff"}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
-              <a href="/owner/login">List your Property</a>
+              <button id="blue" className="btn btn-group" style = {{color: "#fff", fontFamily: "Lato,Arial,Helvetica Neue,sans-serif", height: "40px", backgroundColor:"#fff", width: "200px", borderRadius: 25, borderColor: "#ffffff"}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
+                <a id="list" href="/owner/login">List your Property</a>
               </button>
               <img src={require('./homeaway_house_white.svg')} alt="Homeaway Logo"/>
           </div>
@@ -189,20 +195,28 @@ class Home extends Component {
                   <div className="row">
                     <div className="col-md-4 col-md-offset-3">
                       <div className="form-group">
-                      	<input type="text" style ={{height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control" name="search" id="search" placeholder="Where do you want to go?" onChange = {this.searchLocationChangeHandler}/>
-                        <span className="glyphicon glyphicon-search form-control-feedback"></span>
+                      <div class="input-group">
+                        <span class="input-group-prepend">
+                          <div class="input-group-text form-control" ><i class="fa fa-map-marker"></i></div>
+                        </span>
+                      	<input type="text" style ={{height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control" name="search" id="home" placeholder="Where do you want to go?" onChange = {this.searchLocationChangeHandler}/>
+                        </div>
                       </div>
                     </div>
                   <div className="col-md-offset-3">
-                    <input style ={{width: "130px", height: "60px"}} onChange = {this.fromDateChangeHandler} type="date" name="fromdate"/>  
+                    <input placeholder="Arrive" style ={{width: "183px", height: "60px"}} onChange = {this.fromDateChangeHandler} type="date" name="fromdate"/>  
                   </div>
                   <div className="col-md-offset-3" style = {{marginLeft: "13px"}}>
-                    <input style ={{width: "130px", height: "60px"}} onChange = {this.toDateChangeHandler} type="date" name="todate"/>  
+                    <input placeholder="Depart" style ={{width: "187px", height: "60px"}} onChange = {this.toDateChangeHandler} type="date" name="todate"/>  
                   </div>
-                  <div className="col-md-offset-3" style = {{marginLeft: "13px"}}>
-                    <div className="form-group">
-                      <input type="number" min = "1" style ={{height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control" placeholder="No of guests?" onChange = {this.guestsChangeHandler}/>
-                      <span className="glyphicon glyphicon-search form-control-feedback"></span>
+                  <div class="form-group">
+                    <div className="col-md-offset-3" style = {{marginLeft: "13px"}}>
+                      <div class="input-group">
+                        <span class="input-group-prepend">
+                          <div class="input-group-text form-control" ><i class="fa fa-user-friends"></i></div>
+                        </span>
+                        <input id="home" type="number" min = "1" style ={{height: "60px", width: "140px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica", position: "relative"}} className="form-control" placeholder="No of guests?" onChange = {this.guestsChangeHandler}/>
+                      </div>
                     </div>
                   </div>
                   <div className="col-md-offset-3" style = {{marginLeft: "13px"}}>

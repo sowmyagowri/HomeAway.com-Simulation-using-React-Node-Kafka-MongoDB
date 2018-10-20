@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import './PropertyDetails.css';
 import 'typeface-roboto'
-import axios from 'axios';
 import cookie from 'react-cookies';
 import moment from 'moment';
 import {Navbar} from "react-bootstrap";
@@ -13,6 +12,10 @@ import Tab from 'react-web-tabs/lib/Tab';
 import TabPanel from 'react-web-tabs/lib/TabPanel';
 import TabList from 'react-web-tabs/lib/TabList';
 import SweetAlert from 'react-bootstrap-sweetalert';
+
+import { propertydetails, propertybook } from '../actions';
+import { reduxForm } from "redux-form";
+import { connect } from 'react-redux';
 
 class PropertyDetails extends Component {
     constructor(props){
@@ -49,13 +52,12 @@ class PropertyDetails extends Component {
         console.log("In Property Details");
         var propertyID = this.state.propertyid;
 
-        var url = "http://localhost:3001/homeaway/property/" + propertyID;
-        axios.get(url)
+        this.props.propertydetails(propertyID, sessionStorage.getItem('jwtToken'))
         .then(response => {
-            console.log("Status Code : ", response.status);
-            if(response.status === 200){
-                console.log(response.data)
-                this.setState({propertyDetails : response.data})
+            console.log("Status Code : ", response.payload.status);
+            if(response.payload.status === 200){
+                console.log(response.payload.data)
+                this.setState({propertyDetails : response.payload.data})
             }
             console.log(this.state.propertyDetails.headline);
         });
@@ -168,16 +170,18 @@ class PropertyDetails extends Component {
     
         var price = this.state.price
         price = price.toString();
-
+        var travellerName = cookie.load('cookie3') + cookie.load('cookie4');
         var data = {
             propertyid: this.state.propertyid,
             bookedBy: cookie.load('cookie2'),
+            travellerName: travellerName,
             bookedFrom : this.state.bookingFromDate,
             bookedTo : this.state.bookingToDate,
             NoOfGuests : this.state.guests,
             pricePaid : price
             }
-            axios.post('http://localhost:3001/homeaway/bookproperty', data)
+
+            this.props.propertybook(data, sessionStorage.getItem('jwtToken'))
             .then(response => {
                 console.log("Status Code : ",response.status);
                 if(response.status === 200){
@@ -436,4 +440,10 @@ class PropertyDetails extends Component {
     }
 }
   
-export default PropertyDetails;
+function mapStateToProps(state) {
+    return { propertydetails: state.propertydetails, propertybook: state.propertybook };
+}
+
+export default reduxForm({
+    form: "PropertyDetailsForm"
+  })(connect(mapStateToProps, {propertydetails, propertybook}) (PropertyDetails) );

@@ -1,10 +1,18 @@
 //Libraries
 var express = require('express');
 var router = express.Router();
-var crypt = require('../models/bcrypt.js');
-var Users = require('../models/UserDBSchema');
 
-// Validate traveller login user details
+var crypt = require('../models/bcrypt.js');
+var Users = require('../models/UserSchema');
+
+var config = require('../../config/settings');
+
+// Set up middleware
+var jwt = require('jsonwebtoken');
+var passport = require('passport');
+var requireAuth = passport.authenticate('jwt', {session: false});
+
+// Validate traveller login user details and get a JSON Web Token to include in the header of future requests.
 router.route('/traveller/login').post(function (req, res) {
   console.log("Inside traveller Login Post");
   var email = req.body.email;
@@ -17,13 +25,20 @@ router.route('/traveller/login').post(function (req, res) {
       console.log("unable to read the database");
       res.status(400).json({responseMessage: 'unable to read the users database'});
     } else if (user) {
+      //printSchema(user, "");
       crypt.compareHash(req.body.password, user.password, function (err, isMatch) {
         if (isMatch && !err) {
+          // Create token if the password matched and no error was thrown
+          var token = jwt.sign({ id: user._id, email: user.email }, config.secret_key, {
+            expiresIn: 7200 // expires in 2 hours
+          });
           res.cookie('cookie1',"travellercookie",{maxAge: 900000, httpOnly: false, path : '/'});
           res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
           res.cookie('cookie3',user.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
+          res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
           req.session.user = user.email;
-          res.status(200).json({responseMessage: 'Login Successful'});
+          //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
+          res.status(200).json({responseMessage: 'Login Successful', token: 'JWT ' + token});
           console.log("Traveller found in DB");
         } else {
           res.status(401).json({responseMessage: 'Authentication failed. Passwords did not match.'})
@@ -37,7 +52,7 @@ router.route('/traveller/login').post(function (req, res) {
   })
 })
 
-// Validate owner login user details
+// Validate owner login user details and get a JSON Web Token to include in the header of future requests.
 router.route('/owner/login').post(function (req, res) {
   console.log("Inside Owner Login Post");
   var email = req.body.email;
@@ -51,12 +66,18 @@ router.route('/owner/login').post(function (req, res) {
     } else if (user) {
         crypt.compareHash(req.body.password, user.password, function (err, isMatch) {
           if (isMatch && !err && user.isOwner == 'Y') {
+            // Create token if the password matched and no error was thrown
+            var token = jwt.sign({ id: user._id, email: user.email }, config.secret_key, {
+              expiresIn: 7200 // expires in 2 hours
+            });
             res.cookie('cookie1',"ownercookie",{maxAge: 900000, httpOnly: false, path : '/'});
             res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
             res.cookie('cookie3',user.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
+            res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
             req.session.user = user.email;
+            //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
+            res.status(200).json({responseMessage: 'Login Successful', token: 'JWT ' + token});
             console.log("Owner found in DB");
-            res.status(200).json({responseMessage: 'Login Successful'});
           } else {
             res.status(401).json({responseMessage: 'Authentication failed. Passwords did not match.'})
             console.log("Authentication failed. Passwords did not match.");
@@ -70,7 +91,7 @@ router.route('/owner/login').post(function (req, res) {
     })
   });
 
-// Add traveller users
+// Add traveller users and get a JSON Web Token to include in the header of future requests.
 router.route('/traveller/signup').post(function (req, res) {
   console.log("In traveller Signup Post");
   console.log(req.body);
@@ -106,10 +127,16 @@ router.route('/traveller/signup').post(function (req, res) {
             res.status(400).send("unable to insert into database");
           } else {
             console.log("User Added");
+            // Create token if the password matched and no error was thrown
+            var token = jwt.sign({ id: user._id, email: user.email }, config.secret_key, {
+              expiresIn: 7200 // expires in 2 hours
+            });
             res.cookie('cookie1',"travellercookie",{maxAge: 900000, httpOnly: false, path : '/'});
             res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
             res.cookie('cookie3',req.body.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-            res.status(200).json({responseMessage: 'User Added'});
+            res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
+            //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
+            res.status(200).json({responseMessage: 'User Added', token: 'JWT ' + token});
           }});
         })
       }
@@ -117,7 +144,7 @@ router.route('/traveller/signup').post(function (req, res) {
   });
 });
 
-// Add owner users
+// Add owner users and get a JSON Web Token to include in the header of future requests.
 router.route('/owner/signup').post(function (req, res) {
   console.log("In owner Signup Post");
   email = req.body.email.toLowerCase();
@@ -144,16 +171,21 @@ router.route('/owner/signup').post(function (req, res) {
               console.log("unable to update user to owner");
               res.status(400).json({responseMessage: 'unable to update user to owner'});
             } else{
+              // Create token if the password matched and no error was thrown
+              var token = jwt.sign({ id: user._id, email: user.email }, config.secret_key, {
+                expiresIn: 7200 // expires in 2 hours
+              });
               console.log("Owner profile added to traveller login");
               res.cookie('cookie1',"ownercookie",{maxAge: 900000, httpOnly: false, path : '/'});
               res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
               res.cookie('cookie3',rows.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-              res.status(201).json({responseMessage: 'Owner profile added to traveller login'});
+              res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
+              //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
+              res.status(201).json({responseMessage: 'Owner profile added to traveller login', token: 'JWT ' + token});
             }
           })
         }
       } else {
-
         crypt.createHash(req.body.password, function (response) {
           encryptedPassword = response;
       
@@ -173,10 +205,16 @@ router.route('/owner/signup').post(function (req, res) {
             res.status(400).json({responseMessage: 'unable to insert into users database'});
           } else {
             console.log("Owner Added");
+            // Create token if the password matched and no error was thrown
+            var token = jwt.sign({ id: user._id, email: user.email }, config.secret_key, {
+              expiresIn: 7200 // expires in 2 hours
+            });
             res.cookie('cookie1',"ownercookie",{maxAge: 900000, httpOnly: false, path : '/'});
             res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
             res.cookie('cookie3',req.body.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-            res.status(200).json({responseMessage: 'Owner Added'});
+            res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
+            //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
+            res.status(200).json({responseMessage: 'Owner Added', token: 'JWT ' + token});
           }});
         })
       }
@@ -185,10 +223,9 @@ router.route('/owner/signup').post(function (req, res) {
 });
 
 // fetch user profile details
-router.route('/profile').post(function (req, res) {
+router.route('/profile').post(requireAuth, function (req, res) {
   console.log("Inside Profile fetch");
   var input_email = req.body.email;
-
   Users.findOne({email:input_email}, function(err,result){
     if (err){
       console.log(err);
@@ -202,7 +239,7 @@ router.route('/profile').post(function (req, res) {
 });
 
 // save user profile details
-router.route('/profilesave').post(function (req, res) {
+router.route('/profilesave').post(requireAuth, function (req, res) {
   console.log("In profile save Post");
   email = req.body.email.toLowerCase();
   trimemail = email.trim();
@@ -235,5 +272,16 @@ router.route('/profilesave').post(function (req, res) {
     }
   })
 });
+
+function printSchema(obj, indent) {
+  for (var key in obj) {
+      if(typeof obj[key] != "function"){     //we don't want to print functions
+         console.log(indent, key, typeof obj[key]) ;    
+          if (typeof obj[key] == "object") {             //if current property is of object type, print its sub properties too
+              printSchema(obj[key], indent + "\t");
+          }
+      }
+  }
+};
 
 module.exports = router;

@@ -5,4 +5,9 @@ export const userConstants = {
     OWNER_SIGNUP: 'ownersignup',
     PROFILE_FETCH: 'profilefetch',
     PROFILE_SAVE: 'profilesave',
+    PROPERTY_POST: 'propertypost',
+    PROPERTY_SEARCH: 'propertysearch',
+    PROPERTY_DETAILS: 'propertydetails',
+    PROPERTY_BOOK: 'propertybook',
+    LIST_BOOKINGS: 'listbookings'
 };
