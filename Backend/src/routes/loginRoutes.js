@@ -59,10 +59,9 @@ router.route('/owner/login').post(function (req, res) {
   var lowercaseemail = email.toLowerCase();
   var trimemail = lowercaseemail.trim();
   
-  Users.findOne({email:trimemail}, function(err,user){
+  Users.findOne({email:trimemail, isOwner: 'Y'}, function(err,user){
     if (err) {
-      console.log("User does not exist");
-      res.status(400).json({responseMessage: 'User does not exist'});
+        console.log(Err);
     } else if (user) {
         crypt.compareHash(req.body.password, user.password, function (err, isMatch) {
           if (isMatch && !err && user.isOwner == 'Y') {
@@ -77,16 +76,15 @@ router.route('/owner/login').post(function (req, res) {
             req.session.user = user.email;
             //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
             res.status(200).json({responseMessage: 'Login Successful', token: 'JWT ' + token});
-            console.log("Owner found in DB");
+            console.log("Owner found in DB and token is", token);
           } else {
             res.status(401).json({responseMessage: 'Authentication failed. Passwords did not match.'})
             console.log("Authentication failed. Passwords did not match.");
           }
         })
-      }
-      else {
-        res.status(402).json({responseMessage: 'Authentication failed. User does not exist.'})
-        console.log("Authentication failed. User does not exist.");
+      } else {
+        res.status(402).json({responseMessage: 'Authentication failed. Owner Profile does not exist.'});
+        console.log("Authentication failed. Owner Profile does not exist.");
       }
     })
   });
@@ -121,7 +119,7 @@ router.route('/traveller/signup').post(function (req, res) {
           }
         
           //Save the user in database
-          Users.create( userData, function (err) {
+          Users.create( userData, function (err,user) {
             if (err) {
             console.log("unable to insert into database", err);
             res.status(400).send("unable to insert into database");
@@ -165,7 +163,7 @@ router.route('/owner/signup').post(function (req, res) {
         } else{
 
           //Update traveller as owner in database
-          Users.findOneAndUpdate({email:trimemail}, {isOwner:'Y'}, function(err,rows){
+          Users.findOneAndUpdate({email:trimemail}, {isOwner:'Y'}, function(err,user){
             if (err) {
               console.log(err);
               console.log("unable to update user to owner");
@@ -199,7 +197,7 @@ router.route('/owner/signup').post(function (req, res) {
           }
       
           //Save the user as owner in database
-          Users.create( userData, function (err) {
+          Users.create( userData, function (err,user) {
           if (err) {
             console.log("unable to insert into database");
             res.status(400).json({responseMessage: 'unable to insert into users database'});

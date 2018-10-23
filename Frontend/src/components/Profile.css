@@ -48,7 +48,7 @@ body{
     margin: 0 auto;
   }
   
-  #ulinktab{
+  #ulinktab li{
     display: inline;
     text-align: center;
   }
@@ -75,9 +75,13 @@ body{
     margin-left: 50%;
   }
   
+  .four:hover ~ #hrtab {
+    margin-left: 75%;
+  }
+
   #hrtab {
     height: .25rem;
-    width: 30% !important;
+    width: 25%;
     margin: 0;
     background: blue;
     border: none;

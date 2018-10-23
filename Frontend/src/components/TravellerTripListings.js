@@ -1,10 +1,16 @@
 import React, {Component} from 'react';
 import 'typeface-roboto'
 import './OwnerPropertyListings.css';
-import axios from 'axios';
+import './TravellerTripListings.css';
 import cookie from 'react-cookies';
 import {Redirect} from 'react-router';
-import {Navbar} from "react-bootstrap";;
+import {Navbar} from "react-bootstrap";
+
+import { travellertrips } from '../actions';
+import { reduxForm } from "redux-form";
+import { connect } from 'react-redux';
+
+import Pagination from "./Pagination";
 
 class TravellerTripListings extends Component {
     
@@ -35,7 +41,7 @@ class TravellerTripListings extends Component {
     }
         console.log("Calling Property Listings in Will Mount");
         console.log(data);
-        this.props.travellertrips(data)
+        this.props.travellertrips(data, sessionStorage.getItem('jwtToken'))
         .then(response => {
             console.log("Status Code : ", response.payload.status);
             if(response.payload.status === 200){
@@ -103,36 +109,54 @@ class TravellerTripListings extends Component {
 
   return(
     <div>
-      {redirectVar}
-      <Navbar inverse collapseOnSelect>
-          <Navbar.Header>
+        {redirectVar}
+        <Navbar inverse collapseOnSelect>
+            <Navbar.Header>
             <Navbar.Brand>
             <a href="/" title = "HomeAway" className = "logo"><img alt="Homeaway Logo" src={require('./homeaway_logo.png')}/></a>
             </Navbar.Brand>
-          </Navbar.Header>
-        <div>
-           <div className="btn btn-group">
-             <button className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
-             <div className="dropdown-menu">
-                <a className="dropdown-item" href="/Profile">Profile</a>
-                <a className="dropdown-item" href="/">Book My Trip</a>
-                <a className="dropdown-item" onClick = {this.logout}>Logout</a>
-             </div>
-           </div>
-           <img src={require('./logo.png')} alt="Homeaway Logo"/>
-        </div>
-      </Navbar>
-            <div className = "container-full">
-                <div className="container-pad">
-                    <div className="form-row myformrow">
-                        <div className="form-group col-sm-9" id = "property-listings" style ={{maxWidth : "900px"}}>
-                            { this.renderTrips() }
-                        </div>
+            </Navbar.Header>
+            <div>
+                <div className="btn btn-group" id="white">
+                    <button className="dropdown-toggle" style = {{fontSize: "18px", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                    <div className="dropdown-menu">
+                        <a className="dropdown-item" href="#"> <i class="fas fa-envelope"></i> Inbox</a>
+                        <a className="dropdown-item" href="/traveller/mytrips"> <i class="fas fa-briefcase"></i> My Trips</a>
+                        <a className="dropdown-item" href="/Profile"> <i class="fas fa-user"></i> My Profile</a>
+                        <a className="dropdown-item" href="#" onClick= {this.logout}> <i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                 </div>
-          </div>
+                <img style={{marginLeft: "50px"}} src={require('./logo.png')} alt="Homeaway Logo"/>
+            </div>
+        </Navbar>
+        <div style={{backgroundColor: "white", borderLeftColor:"white",borderRightColor:"white",borderBottomColor: "#d6d7da", borderTopColor: "#d6d7da", borderStyle: "solid"}}>
+            <div id="conttab" class="container">
+                <ul id="ulinktab">
+                    <li id="ulinktab" class="one"><a id="linktab" href="#"> <i class="fas fa-envelope"></i> Inbox</a></li>
+                    <li id="ulinktab" class="two"><a id="linktab" href="/traveller/mytrips"> <i class="fas fa-briefcase"></i> My Trips</a></li>
+                    <li id="ulinktab" class="three"><a id="linktab" href="/Profile"> <i class="fas fa-user"></i> My Profile</a></li>
+                    <hr id="hrtab3" />
+                </ul>
+            </div>
         </div>
-        )
-    }
+        <div className = "container-full">
+            <div className="container-pad">
+                <div className="form-row myformrow">
+                    <div className="form-group col-sm-9" id = "property-listings" style ={{maxWidth : "900px"}}>
+                        { this.renderTrips() }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   )
+  }
 }
-export default TravellerTripListings;
+
+function mapStateToProps(state) {
+    return { travellertrips: state.travellertrips };
+}
+
+export default reduxForm({
+    form: "TravellerTripsForm"
+  })(connect(mapStateToProps, {travellertrips}) (TravellerTripListings) );

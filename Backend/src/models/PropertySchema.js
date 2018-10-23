@@ -21,7 +21,7 @@ PropertySchema = new Schema({
   },
   bedrooms: {
     type: Number,
-    default: 1
+    default: ''
   },
   bathrooms: {
     type: Number,
@@ -36,8 +36,8 @@ PropertySchema = new Schema({
     default: 1
   },
   baseRate: {
-    type: Double,
-    default: 0.00
+    type: Number,
+    default: ''
   },
   headline: {
     type: String,
@@ -95,6 +95,24 @@ PropertySchema = new Schema({
     type: String,
     default: ''
   },
+  bookingID:[{
+    type: String
+  }],
+  bookedFrom: [{
+    type: String
+  }],
+  bookedTo: [{
+    type: String
+  }],
+  bookedBy: [{
+    type: String
+  }],
+  noOfGuests: [{
+    type: String
+  }],
+  price: [{
+    type: String
+  }],
 });
     
 module.exports = mongoose.model('Properties', PropertySchema); 

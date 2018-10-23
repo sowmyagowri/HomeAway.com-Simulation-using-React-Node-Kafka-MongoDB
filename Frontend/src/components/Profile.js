@@ -221,7 +221,7 @@ class Profile extends Component{
                         ?
                         (
                         <div className="btn btn-group" id="white">
-                            <button className="dropdown-toggle"  style = {{fontSize: "18px",  backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                            <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
                             <div className="dropdown-menu">
                                 <a className="dropdown-item" href="#"> <i class="fas fa-envelope"></i> Inbox</a>
                                 <a className="dropdown-item" href="/traveller/mytrips"> <i class="fas fa-briefcase"></i> My Trips</a>
@@ -233,11 +233,11 @@ class Profile extends Component{
                         :
                         (
                         <div className="btn btn-group" id="white">
-                            <button className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                            <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
                             <div className="dropdown-menu">
                                 <a className="dropdown-item" href="#"> <i class="fas fa-envelope"></i> Inbox</a>
                                 <a className="dropdown-item" href="/owner/mylistings"> <i class="fas fa-home"></i> My Listings</a>
-                                <a className="dropdown-item" href="/owner/propertypost"> <i class="far fa-building"></i> Post Property</a>
+                                <a className="dropdown-item" href="/owner/propertypost"> <i class="fas fa-building"></i> Post Property</a>
                                 <a className="dropdown-item" href="/Profile"> <i class="fas fa-user"></i> My Profile</a>
                                 <a className="dropdown-item" onClick = {this.logout}> <i class="fas fa-sign-out-alt"></i> Logout</a>
                             </div>
@@ -248,8 +248,8 @@ class Profile extends Component{
                     </div>
                 </Navbar>
                 <div className="container">
-                <p></p>
                 </div>
+                <div style={{backgroundColor: "white", borderLeftColor:"white",borderRightColor:"white",borderBottomColor: "#d6d7da", borderTopColor: "#d6d7da", borderStyle: "solid"}}>
                 {(cookie.load('cookie1') === 'travellercookie') 
                 ?
                 (
@@ -269,11 +269,13 @@ class Profile extends Component{
                             <li id="ulinktab" class="one"><a id="linktab" href="#"> <i class="fas fa-envelope"></i> Inbox</a></li>
                             <li id="ulinktab" class="two"><a id="linktab" href="/owner/mylistings"> <i class="fas fa-home"></i> My Listings</a></li>
                             <li id="ulinktab" class="three"><a id="linktab" href="/Profile"> <i class="fas fa-user"></i> My Profile</a></li>
+                            <li id="ulinktab" class="four"><a id="linktab" href="/owner/propertypost"> <i class="fas fa-building"></i> Post Property</a></li>
                             <hr id="hrtab" />
                         </ul>
                     </div>
                 )
                 }
+                </div>
                 <div className="image "></div>
                 <div id = "profilehref" className="myprofilecontainer">
                     <div className="login-form">

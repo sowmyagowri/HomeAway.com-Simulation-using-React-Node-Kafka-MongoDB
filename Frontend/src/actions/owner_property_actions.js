@@ -20,6 +20,25 @@ export function propertypost(formdata, tokenFromStorage) {
   };  
 }
 
+//target action for property listings
+export function propertylisting(formdata, tokenFromStorage) {
+  console.log("Inside Owner Property Listing action")
+  console.log(formdata)
+  console.log("tokenFromStorage", tokenFromStorage)
+  var config = {
+    headers: {'Authorization': tokenFromStorage,
+              'Content-Type': 'application/json'
+    }
+  };
+  axios.defaults.withCredentials = true;
+  const response =  axios.post('http://localhost:3001/homeaway/owner/propertylistings', formdata, config)
+  console.log("Response", response);
+  return {
+    type: userConstants.PROPERTY_LIST,
+    payload: response
+  };  
+}
+
 //target action for property search
 export function propertysearch(formdata, tokenFromStorage) {
   console.log("Inside Owner Property Search action")

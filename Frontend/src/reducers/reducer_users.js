@@ -1,7 +1,6 @@
 import { userConstants } from '../constants';
 
 //Reducer listening to different action types
-
 export function authentication(state = {}, action) {
   switch (action.type) {
     case userConstants.DO_TRAVELLER_LOGIN:
@@ -25,6 +24,8 @@ export function authentication(state = {}, action) {
     case userConstants.PROPERTY_BOOK:
       return action.payload;
     case userConstants.LIST_BOOKINGS:
+      return action.payload;
+    case userConstants.PROPERTY_LIST:
       return action.payload;
     default:
       return state;

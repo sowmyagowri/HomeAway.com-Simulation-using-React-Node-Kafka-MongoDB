@@ -56,7 +56,7 @@ app.use(morgan('dev'));
 
 // Routes and Backend Funcioncalities
 var loginRoutes = require('./src/routes/loginRoutes');
-//var propertyRoutes = require('./src/routes/propertyRoutes');
+var propertyRoutes = require('./src/routes/propertyRoutes');
 
 app.use(express.static('public'));
 
@@ -71,7 +71,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 app.use(basePath, loginRoutes);
-//app.use(basePath, propertyRoutes);
+app.use(basePath, propertyRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '/uploads/')));
 
 // Execute App

@@ -6,6 +6,7 @@ export const userConstants = {
     PROFILE_FETCH: 'profilefetch',
     PROFILE_SAVE: 'profilesave',
     PROPERTY_POST: 'propertypost',
+    PROPERTY_LIST: 'propertylist',
     PROPERTY_SEARCH: 'propertysearch',
     PROPERTY_DETAILS: 'propertydetails',
     PROPERTY_BOOK: 'propertybook',

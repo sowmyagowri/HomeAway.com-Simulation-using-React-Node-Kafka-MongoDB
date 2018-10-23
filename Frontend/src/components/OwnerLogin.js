@@ -48,6 +48,7 @@ class OwnerLogin extends Component{
                 password : password
             }
             this.props.ownerlogin(data).then(response => {
+                console.log(response.payload.status);
                 if(response.payload.status === 200){
                     this.setState({
                         message: ""
@@ -73,7 +74,7 @@ class OwnerLogin extends Component{
         let redirectVar = null;
         console.log("Cookie is", cookie.load('cookie1'));
         if(cookie.load('cookie1') === 'ownercookie'){
-            redirectVar = <Redirect to= "/owner/propertypost"/>
+            redirectVar = <Redirect to= "/owner/mylistings"/>
         }
         return(
             <div>

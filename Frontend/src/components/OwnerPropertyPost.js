@@ -304,16 +304,27 @@ render(){
            <div className="btn btn-group" id="white">
              <button className="dropdown-toggle"  style = {{fontSize: "18px",  backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {this.state.name}</button>
              <div className="dropdown-menu">
-                <a className="dropdown-item" href="#"> <i class="fas fa-envelope"></i> Inbox</a>
-                <a className="dropdown-item" href="/owner/mylistings"> <i class="fas fa-home"></i> My Listings</a>
-                <a className="dropdown-item" href="/owner/propertypost"> <i class="far fa-building"></i> Post Property</a>
-                <a className="dropdown-item" href="/Profile"> <i class="fas fa-user"></i> My Profile</a>
-                <a className="dropdown-item" onClick = {this.logout}> <i class="fas fa-sign-out-alt"></i> Logout</a>
+                <a className="dropdown-item" href="#"> <i className="fas fa-envelope"></i> Inbox</a>
+                <a className="dropdown-item" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a>
+                <a className="dropdown-item" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a>
+                <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
+                <a className="dropdown-item" onClick = {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
              </div>
            </div>
            <img style={{marginLeft: "50px"}} src={require('./logo.png')} alt="Homeaway Logo"/>
         </div>
       </Navbar>
+      <div style={{backgroundColor: "white", borderLeftColor:"white",borderRightColor:"white",borderBottomColor: "#d6d7da", borderTopColor: "#d6d7da", borderStyle: "solid"}}>
+        <div id="conttab" class="container">
+            <ul id="ulinktab">
+                <li id="ulinktab" class="one"><a id="linktab" href="#"> <i class="fas fa-envelope"></i> Inbox</a></li>
+                <li id="ulinktab" class="two"><a id="linktab" href="/owner/mylistings"> <i class="fas fa-home"></i> My Listings</a></li>
+                <li id="ulinktab" class="three"><a id="linktab" href="/Profile"> <i class="fas fa-user"></i> My Profile</a></li>
+                <li id="ulinktab" class="four"><a id="linktab" href="/owner/propertypost"> <i class="fas fa-building"></i> Post Property</a></li>
+                <hr id="hrtab2" />
+            </ul>
+        </div>
+      </div>
        <div className="container" style = {{fontFamily: "Lato,Arial,Helvetica Neue,sans-serif", marginTop : "50px"}}>
        <div className="row">
          <div className="col-md-12">

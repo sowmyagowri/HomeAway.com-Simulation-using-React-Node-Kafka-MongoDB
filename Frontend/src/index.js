@@ -34,7 +34,7 @@ const store = createStore(RootReducer, applyMiddleware(promise,loggerMiddleware)
 
 ReactDOM.render(
   
-  <div className="container-fluid">
+  <div className="container-fluid" style={{width: "1590px"}}>
     <div>
       <Provider store={store}>
         <Router>

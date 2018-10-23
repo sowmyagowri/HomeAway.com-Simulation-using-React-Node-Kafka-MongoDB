@@ -153,7 +153,6 @@ class Home extends Component {
               <img style={{marginTop: "13px"}} alt="US Flag" src={require('./us_flag.png')}/>
             </div>
             <button className="btn" id="white" style = {{fontColor : "#0067db", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button">Trip Boards</button>
-            {console.log(this.state.isTravelerLoggedIn )}
             {!this.state.isTravelerLoggedIn 
               ?
               (
@@ -195,11 +194,11 @@ class Home extends Component {
                   <div className="row">
                     <div className="col-md-4 col-md-offset-3">
                       <div className="form-group">
-                      <div class="input-group">
-                        <span class="input-group-prepend">
-                          <div class="input-group-text form-control" ><i class="fa fa-map-marker"></i></div>
-                        </span>
-                      	<input type="text" style ={{height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control" name="search" id="home" placeholder="Where do you want to go?" onChange = {this.searchLocationChangeHandler}/>
+                        <div class="input-group">
+                          <span class="input-group-prepend">
+                            <div class="input-group-text form-control" ><i class="fa fa-map-marker"></i></div>
+                          </span>
+                          <input type="text" style ={{height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control" name="search" id="home" placeholder="Where do you want to go?" onChange = {this.searchLocationChangeHandler}/>
                         </div>
                       </div>
                     </div>
