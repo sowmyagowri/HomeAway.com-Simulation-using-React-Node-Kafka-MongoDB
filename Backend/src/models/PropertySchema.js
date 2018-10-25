@@ -95,24 +95,6 @@ PropertySchema = new Schema({
     type: String,
     default: ''
   },
-  bookingID:[{
-    type: String
-  }],
-  bookedFrom: [{
-    type: String
-  }],
-  bookedTo: [{
-    type: String
-  }],
-  bookedBy: [{
-    type: String
-  }],
-  noOfGuests: [{
-    type: String
-  }],
-  price: [{
-    type: String
-  }],
 });
     
 module.exports = mongoose.model('Properties', PropertySchema); 

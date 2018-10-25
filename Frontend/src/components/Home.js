@@ -148,7 +148,7 @@ class Home extends Component {
               <a href="/" title = "HomeAway" className = "logo"><img alt="Homeaway White Logo" src={require('./homeaway_white.svg')}/></a>
             </Navbar.Brand>
           </Navbar.Header>
-          <div class="box">
+          <div className="box">
             <div>
               <img style={{marginTop: "13px"}} alt="US Flag" src={require('./us_flag.png')}/>
             </div>
@@ -170,10 +170,10 @@ class Home extends Component {
                   <div id="white" className="btn btn-group" style = {{marginRight: "160px", width: "50px", }}>
                     <button className="dropdown-toggle" style = {{color: "white", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
                     <div className="dropdown-menu">
-                      <a className="dropdown-item" href="/Profile"> <i class="fas fa-envelope"></i> Inbox</a>
-                      <a className="dropdown-item" href="/traveller/mytrips"> <i class="fas fa-briefcase"></i> My Trips</a>
-                      <a className="dropdown-item" href="/Profile"> <i class="fas fa-user"></i> My Profile</a>
-                      <a className="dropdown-item" href="#" onClick= {this.logout}> <i class="fas fa-sign-out-alt"></i> Logout</a>
+                      <a className="dropdown-item" href="/Profile"> <i className="fas fa-envelope"></i> Inbox</a>
+                      <a className="dropdown-item" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a>
+                      <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
+                      <a className="dropdown-item" href="#" onClick= {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                   </div>
                 <img style = {{marginRight: "20px", }} alt="US Flag" src={require('./mailbox.png')}/>
@@ -194,9 +194,9 @@ class Home extends Component {
                   <div className="row">
                     <div className="col-md-4 col-md-offset-3">
                       <div className="form-group">
-                        <div class="input-group">
-                          <span class="input-group-prepend">
-                            <div class="input-group-text form-control" ><i class="fa fa-map-marker"></i></div>
+                        <div className="input-group">
+                          <span className="input-group-prepend">
+                            <div className="input-group-text form-control" ><i className="fa fa-map-marker"></i></div>
                           </span>
                           <input type="text" style ={{height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control" name="search" id="home" placeholder="Where do you want to go?" onChange = {this.searchLocationChangeHandler}/>
                         </div>
@@ -208,11 +208,11 @@ class Home extends Component {
                   <div className="col-md-offset-3" style = {{marginLeft: "13px"}}>
                     <input placeholder="Depart" style ={{width: "187px", height: "60px"}} onChange = {this.toDateChangeHandler} type="date" name="todate"/>  
                   </div>
-                  <div class="form-group">
+                  <div className="form-group">
                     <div className="col-md-offset-3" style = {{marginLeft: "13px"}}>
-                      <div class="input-group">
-                        <span class="input-group-prepend">
-                          <div class="input-group-text form-control" ><i class="fa fa-user-friends"></i></div>
+                      <div className="input-group">
+                        <span className="input-group-prepend">
+                          <div className="input-group-text form-control" ><i className="fa fa-user-friends"></i></div>
                         </span>
                         <input id="home" type="number" min = "1" style ={{height: "60px", width: "140px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica", position: "relative"}} className="form-control" placeholder="No of guests?" onChange = {this.guestsChangeHandler}/>
                       </div>

@@ -22,13 +22,18 @@ class OwnerPropertyListings extends Component {
             allListings:[{}],
             currentListings:[{}],
             detailsFetched:false,
-            authFlag: false,
             currentPage: null,
             totalPages: null,
+            refreshListings : false,
+            searchString: null,
+            fromdate: null,
+            todate: null,
         };
         
         this.renderListings = this.renderListings.bind(this);
         this.logout = this.logout.bind(this);
+        this.changeHandler = this.changeHandler.bind(this);
+        this.searchProperty = this.searchProperty.bind(this);
     }
 
     logout = () => {
@@ -39,23 +44,109 @@ class OwnerPropertyListings extends Component {
         window.location = "/"
     }
 
+    //search string, from date and to date change handler to update state variable with the text entered by the user
+    changeHandler(e) {
+        console.log(e.target.name,":" ,e.target.value);
+        const { name, value } = e.target;
+        this.setState({ [name]: value });
+    }
+
+    searchProperty = () => {
+
+        console.log("in search property");
+        const requestData = { 
+            listedBy : cookie.load('cookie2'),
+            currentPage: 1, 
+            pageLimit: 0,
+            fromdate: this.state.fromdate,
+            todate: this.state.todate,
+        }
+
+        this.setState({
+            detailsFetched: false,
+        });
+
+        this.props.propertylisting(requestData, sessionStorage.getItem('jwtToken'))
+        .then(response => {
+            if(response.payload.status === 200){
+                if (response.payload.data.length > 0){
+                    if(this.state.searchString === "" || this.state.searchString === null){
+                        const allListings = response.payload.data;
+                        this.setState({
+                            allListings,
+                            detailsFetched: true,
+                            refreshListings: true,
+                        });
+                    } else {
+                        var text = this.state.searchString.toLowerCase();
+                        const allListings = response.payload.data;
+                        let searchedListings1 = allListings.filter((row) => {
+                            return row.headline.toLowerCase().includes(text);
+                        });
+                        if (searchedListings1.length > 0) {
+                            this.setState ({
+                                allListings : searchedListings1,
+                                detailsFetched: true,
+                                refreshListings: true,
+                            })
+                        } else {
+                            this.setState ({
+                                detailsFetched: false,
+                                refreshListings: false,
+                            })
+                        }
+                    }
+                } else {
+                    const allListings = response.payload.data;
+                    this.setState({
+                        allListings,
+                        detailsFetched: false,
+                        refreshTrips: false,
+                    });
+                }
+            }
+        })
+        .catch (error => {
+            console.log(error);
+        });
+    } 
+
     onPageChanged = data => {
+
+        console.log("page changes")
         const { currentPage, totalPages, pageLimit } = data;
         const requestDataPageChange = { 
            listedBy : cookie.load('cookie2'),
            currentPage: currentPage, 
            pageLimit: pageLimit,
+           fromdate: this.state.fromdate,
+           todate: this.state.todate,
         }
 
         this.props.propertylisting(requestDataPageChange, sessionStorage.getItem('jwtToken'))
             .then(response => {
                 console.log("Status Code : ", response.payload.status);
                 if(response.payload.status === 200){
-                    this.setState({
-                        currentListings : response.payload.data,
-                        isLoading : false
-                    });
-                    this.setState({ currentPage, totalPages });
+                    if(this.state.searchString === "" || this.state.searchString === null){
+                        this.setState({
+                            currentListings : response.payload.data,
+                            isLoading : false,
+                            refreshListings: false,
+                        });
+                        this.setState({ currentPage, totalPages });
+                    } else {
+                        var text = this.state.searchString.toLowerCase();
+                        const currentListings = response.payload.data;
+                        let searchedListings2 = currentListings.filter((row) => {
+                            return row.headline.toLowerCase().includes(text);
+                        });
+                        this.setState ({
+                            currentListings : searchedListings2,
+                            isLoading : false,
+                            refreshListings: false,
+                        })
+                        this.setState({ currentPage, totalPages });
+                    }
                 }
         });
     }
@@ -66,6 +157,8 @@ class OwnerPropertyListings extends Component {
             listedBy : cookie.load('cookie2'),
             currentPage: 1, 
             pageLimit: 0,
+            fromdate: this.state.fromdate,
+            todate: this.state.todate,
         }
         
         this.props.propertylisting(requestData, sessionStorage.getItem('jwtToken'))
@@ -89,19 +182,19 @@ class OwnerPropertyListings extends Component {
         const {currentListings} = this.state;
         const {isLoading} = this.state;
 
-        console.log(this.state.currentListings);
         if(!isLoading){
-            console.log("generating content...")
+            console.log("generating property cards...")
             return Object.keys(currentListings).map((i) => {
                     return <div className="brdr bgc-fff pad-10 box-shad btm-mrg-20 myborder1 property-listing" key={currentListings[i].ID}>
                     <div className="media">
                         <a className="pull-left" href="#" target="_parent">
                         <img alt="Thumbnail View of Property" className="img-responsive" src={`http://localhost:3001/uploads/${currentListings[i].image1}`} /></a>
                         <div className="media-body">  
-                            <h4 className="myh4">{currentListings[i].headline}</h4>
-                            <h6 className="myh6">{currentListings[i].description}</h6>
+                            <h4 className="myh4" style={{paddingLeft: "10px"}}>{currentListings[i].headline}</h4>
+                           
+                            <h6 className="myh6" style={{paddingLeft: "10px", justifyContent: "true"}}>{currentListings[i].description}</h6>
   
-                            <ul className="list-inline">
+                            <ul className="list-inline" style={{paddingLeft: "10px"}}>
                                 <li className = "list-inline-item"><img alt="Pindrop Sign" style={{height: "35px"}} src={require('./pindrop.png')}/></li>
                                 <li className = "list-inline-item">{currentListings[i].streetAddress}</li>
                                 <li className = "list-inline-item">{currentListings[i].city}</li>
@@ -109,25 +202,26 @@ class OwnerPropertyListings extends Component {
                                 <li className = "list-inline-item">{currentListings[i].country}</li>
                             </ul>
     
-                            <ul className="list-inline">
+                            <ul className="list-inline" style={{paddingLeft: "10px"}}>
+                                <li className = "list-inline-item"><i class="fas fa-home"></i></li>
                                 <li className = "list-inline-item">{currentListings[i].propertyType}</li>
-                                <li className = "list-inline-item dot"> </li>
+                                <li className = "list-inline-item"><i class="fas fa-bed"></i></li>
                                 <li className = "list-inline-item"> {currentListings[i].bedrooms} BR</li>
-                                <li className = "list-inline-item dot"> </li>
+                                <li className = "list-inline-item"><i class="fas fa-bath"></i></li>
                                 <li className = "list-inline-item"> {currentListings[i].bathrooms} BA</li>
-                                <li className = "list-inline-item dot"></li>
+                                <li className = "list-inline-item"> <i class="fas fa-user"></i></li>
                                 <li className = "list-inline-item"> Sleeps {currentListings[i].sleeps}</li>
-                                <li className = "list-inline-item dot"></li>
+                                <li className = "list-inline-item"><i class="fa fa-calendar"></i></li>
                                 <li className = "list-inline-item"> Min Stay {currentListings[i].minStay}</li>
                             </ul>
     
                             <span>
-                                <strong style ={{fontSize: "20px"}}><span>${currentListings[i].currency + ' ' + currentListings[i].baseRate + ' /night'}</span></strong>
+                                <strong style ={{fontSize: "20px", paddingLeft: "10px"}}><span>{currentListings[i].currency + ' ' + currentListings[i].baseRate + ' /night'}</span></strong>
                             </span>
                             <br></br>
                             <br></br>
                             <span>
-                                <strong style ={{fontSize: "16px"}}><span> Listed From {moment(currentListings[i].startDate).format('MM-DD-YYYY')} To {moment(currentListings[i].endDate).format('MM-DD-YYYY')}</span></strong>
+                                <strong style ={{fontSize: "16px", color: "#ff07ea", paddingLeft: "10px"}}><span> Listed From {moment(currentListings[i].startDate).utc().format('DD MMMM YYYY')} To {moment(currentListings[i].endDate).utc().format('DD MMMM YYYY')}</span></strong>
                             </span>
 
                             <br></br><br></br><br></br>
@@ -171,8 +265,8 @@ class OwnerPropertyListings extends Component {
                 return <tbody data-ng-repeat="bookingData in listingData[i]">
                             <tr>
                                 <td>{listingData.bookedBy[j]}</td>
-                                <td>{listingData.bookedFrom[j]}</td>
-                                <td>{listingData.bookedTo[j]}</td>
+                                <td>{moment(listingData.bookedFrom[j]).utc().format('DD MMMM YYYY')}</td>
+                                <td>{moment(listingData.bookedTo[j]).utc().format('DD MMMM YYYY')}</td>
                                 <td>{listingData.noOfGuests[j]}</td>
                                 <td>$ {listingData.price[j]}</td>
                             </tr>
@@ -183,9 +277,9 @@ class OwnerPropertyListings extends Component {
 
     render(){
         
-        const { currentPage, totalPages, allListings} = this.state;
+        const { currentPage, totalPages, allListings, refreshListings} = this.state;
         const totalListings = allListings.length;
-
+        console.log("render", totalListings);
         let redirectVar = null;
         console.log(cookie.load('cookie1'))
         if(cookie.load('cookie1') !== 'ownercookie'){
@@ -198,21 +292,21 @@ class OwnerPropertyListings extends Component {
                 <Navbar inverse collapseOnSelect>
                     <Navbar.Header>
                         <Navbar.Brand>
-                        <a href="#" title = "HomeAway" className = "logo"><img alt="Homeaway Logo" src={require('./homeaway_logo.png')}/></a>
+                            <a href="#" title = "HomeAway" className = "logo"><img alt="Homeaway Logo" src={require('./homeaway_logo.png')}/></a>
                         </Navbar.Brand>
                     </Navbar.Header>
                     <div>
-                    <div id="white" className="btn btn-group">
-                        <button className="dropdown-toggle"  style = {{fontSize: "18px",backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
-                        <div className="dropdown-menu">
-                            <a className="dropdown-item" href="#"> <i className="fas fa-envelope"></i> Inbox</a>
-                            <a className="dropdown-item" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a>
-                            <a className="dropdown-item" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a>
-                            <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
-                            <a className="dropdown-item" onClick = {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
+                        <div id="white" className="btn btn-group">
+                            <button className="dropdown-toggle"  style = {{fontSize: "18px",backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                            <div className="dropdown-menu">
+                                <a className="dropdown-item" href="#"> <i className="fas fa-envelope"></i> Inbox</a>
+                                <a className="dropdown-item" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a>
+                                <a className="dropdown-item" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a>
+                                <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
+                                <a className="dropdown-item" onClick = {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
+                            </div>
                         </div>
-                    </div>
-                    <img style={{marginLeft: "50px"}} src={require('./logo.png')} alt="Homeaway Logo"/>
+                        <img style={{marginLeft: "50px"}} src={require('./logo.png')} alt="Homeaway Logo"/>
                     </div>
                 </Navbar>
                 <div style={{backgroundColor: "white", borderLeftColor:"white",borderRightColor:"white",borderBottomColor: "#d6d7da", borderTopColor: "#d6d7da", borderStyle: "solid"}}>
@@ -226,24 +320,53 @@ class OwnerPropertyListings extends Component {
                         </ul>
                     </div>
                 </div>
-                {this.state.detailsFetched 
-                ?
-                (   
-                    <div className = "container-full">
+                <div className="container" style = {{}}>
+                    <div className="row d-flex"style={{marginLeft: "200px", height: "70px", padding : "0px 0px 0px 0px"}}>
+                        <div className="col-md-4 col-md-offset-3" style ={{marginLeft: "13px", marginTop: "15px"}}>
+                            <div className="form-group">
+                                <div className="input-group">
+                                <span className="input-group-prepend">
+                                    <div className="input-group-text form-control" ><i class="fas fa-heading"></i></div>
+                                </span>
+                                <input type="text" style ={{height: "50px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control" name="searchString" id="home" placeholder="Property Headline Search..." onChange = {this.changeHandler} value={this.state.searchString}/>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-md-offset-3" style ={{marginTop: "15px"}}>
+                            <input placeholder="From" style ={{width: "180px", height: "50px"}} onChange = {this.changeHandler} value={this.state.fromdate} type="date" name="fromdate"/>  
+                        </div>
+                        <div className="col-md-offset-3" style = {{marginLeft: "13px", marginTop: "15px"}}>
+                            <input placeholder="To" style ={{width: "160px", height: "50px"}} onChange = {this.changeHandler} value={this.state.todate} type="date" name="todate"/>  
+                        </div>
+                        <div className="col-md-offset-3" style = {{marginLeft: "13px", marginTop: "15px"}}>
+                            <div className="form-group">
+                                <button className="btn btn-primary" onClick = {this.searchProperty} style = {{ height: "50px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "120px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>            
+                <div className = "container-full" >
                         <div className="container-pad">
-                            <div className="container mb-5">
-                                <div className="row d-flex flex-row py-5"style={{height: "140px",}}>
-                                    <div className="w-100 px-4 py-5 d-flex flex-row flex-wrap align-items-center justify-content-between">
-                                        <div className="d-flex flex-row py-4 align-items-center">
-                                            <div className="d-flex flex-row py-4 align-items-center">
-                                                <Pagination
-                                                    totalRecords={totalListings}
-                                                    pageLimit={5}
-                                                    pageNeighbours={1}
-                                                    onPageChanged={this.onPageChanged}
-                                                />
-                                            </div>
+                            <div className="container mb-3" style = {{marginBottom: "20px !important"}}>
+                                <div className="row d-flex"style={{height: "70px", padding : "0px 0px 0px 0px"}}>
+                                    <div className="w-100 px-4 py-5 d-flex flex-row flex-wrap align-items-center justify-content-between" style = {{paddingTop : "0px",}}>
+                                    {this.state.detailsFetched &&
+                                    (
+                                        <div className="d-flex flex-row align-items-center" style={{marginLeft: "-20px"}}>
+                                            <Pagination
+                                                totalRecords={totalListings}
+                                                pageLimit={5}
+                                                pageNeighbours={1}
+                                                onPageChanged={this.onPageChanged}
+                                                refresh={refreshListings}
+                                            />
                                         </div>
+                                    )
+                                    }
+                                    {this.state.detailsFetched &&
+                                    (
                                         <div className="d-flex flex-row align-items-center">
                                             {currentPage && (
                                                 <span className="current-page d-inline-block h-100 pl-4 text-secondary" style={{fontSize: "17px",}}>
@@ -252,26 +375,28 @@ class OwnerPropertyListings extends Component {
                                                 </span>
                                             )}
                                         </div>
+                                    )}
                                     </div>
                                 </div>
                             </div>
-                            <div className="form-row myformrow">
-                                <div className="form-group col-sm-9" id = "property-listings" style ={{maxWidth : "900px"}}>
-                                    { this.renderListings() }
+                            {this.state.detailsFetched &&
+                            (
+                                <div className="form-row myformrow">
+                                    <div className="form-group col-sm-9" id = "property-listings" style ={{maxWidth : "900px"}}>
+                                        { this.renderListings() }
+                                    </div>
                                 </div>
+                            )}
+                        </div>
+                    </div>
+                    {!this.state.detailsFetched &&
+                    (
+                        <div className = "container-full">
+                            <div className="container-pad">
+                                <h1> You have not listed any Property! </h1>
                             </div>
                         </div>
-                    </div>
-                )
-                :
-                (
-                    <div className = "container-full">
-                        <div className="container-pad">
-                            <h1> You have not listed any Property! </h1>
-                        </div>
-                    </div>
-                )
-                }
+                    )}
             </div>
         )
     }

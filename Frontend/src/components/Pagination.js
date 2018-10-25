@@ -36,7 +36,8 @@ class Pagination extends Component {
 
   constructor(props) {
     super(props);
-    const { totalRecords = null, pageLimit = 10, pageNeighbours = 0 } = props;
+
+    const { totalRecords = null, pageLimit = 10, pageNeighbours = 0, refresh = false } = props;
   
     this.pageLimit = typeof pageLimit === "number" ? pageLimit : 10;
 
@@ -52,11 +53,33 @@ class Pagination extends Component {
     this.state = { currentPage: 1 };
   }
 
+  componentWillReceiveProps(props) {
+    const { totalRecords = null, pageLimit = 10, pageNeighbours = 0, refresh = false } = props;
+
+    this.pageLimit = typeof pageLimit === "number" ? pageLimit : 10;
+
+    this.totalRecords = typeof totalRecords === "number" ? totalRecords : 0;
+
+    this.pageNeighbours =
+      typeof pageNeighbours === "number"
+        ? Math.max(0, Math.min(pageNeighbours, 2))
+        : 0;
+
+    this.totalPages = Math.ceil(this.totalRecords / this.pageLimit);
+    
+    this.refresh = refresh;
+    
+    if (this.refresh === true) {
+      this.gotoPage(1);
+    }
+  }
+
   componentWillMount() {
     this.gotoPage(1);
   }
 
   gotoPage = page => {
+
     const { onPageChanged = f => f } = this.props;
 
     const currentPage = Math.max(0, Math.min(page, this.totalPages));
@@ -140,6 +163,7 @@ class Pagination extends Component {
 
     const pages = this.fetchPageNumbers();
 
+    
     return (
       <Fragment>
         <nav aria-label="Listings Pagination">
@@ -201,6 +225,7 @@ class Pagination extends Component {
 
 Pagination.propTypes = {
   totalRecords: PropTypes.number.isRequired,
+  refresh: PropTypes.bool.isRequired,
   pageLimit: PropTypes.number,
   pageNeighbours: PropTypes.number,
   onPageChanged: PropTypes.func

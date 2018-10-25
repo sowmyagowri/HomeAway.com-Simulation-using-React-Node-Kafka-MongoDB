@@ -94,55 +94,6 @@ router.route('/property/search').post(function (req, res) {
         bookingsArray.push(bookings[i].propertyID);
       }
       if (req.body.bedroomsHigh === 0){
-        Properties.find( {$and: [ {_id: {$nin: bookingsArray} }, {city: req.body.city.toLowerCase()}, {startDate: {$lte: new Date(req.body.startDate) }}, {endDate: {$gte: new Date(req.body.endDate)}}, {sleeps: {$gte: req.body.noOfGuests}}, {$and: [ {baseRate: {$gte: req.body.priceLow}}, {baseRate: {$lte: req.body.priceHigh}} ] } ] }, function(error,result){
-          if (error) {
-            console.log(error);
-            console.log("unable to search database");
-            res.status(400).json({responseMessage: 'unable to search database'});
-          } else {
-            //console.log(JSON.stringify(result));
-            res.writeHead(200, {'content-type':'application/json'});
-            res.end(JSON.stringify(result));
-            console.log("Property Found"); 
-          }
-        });
-      } else {
-        Properties.find( {$and: [ {_id: {$nin: bookingsArray} }, {city: req.body.city.toLowerCase()}, {startDate: {$lte: new Date(req.body.startDate) }}, {endDate: {$gte: new Date(req.body.endDate)}}, {sleeps: {$gte: req.body.noOfGuests}}, {$and: [ {baseRate: {$gte: req.body.priceLow}}, {baseRate: {$lte: req.body.priceHigh}} ] }, {$and: [ {bedrooms: {$gte: req.body.bedroomsLow}}, {bedrooms: {$lte: req.body.bedroomsHigh}} ] } ] }, function(error,result){
-          if (error) {
-            console.log(error);
-            console.log("unable to search database");
-            res.status(400).json({responseMessage: 'unable to search database'});
-          } else {
-            //console.log(JSON.stringify(result));
-            res.writeHead(200, {'content-type':'application/json'});
-            res.end(JSON.stringify(result));
-            console.log("Property Found"); 
-          }
-        });
-      }
-    }    
-  });
-});
-
-// Search Property
-router.route('/property/search').post(function (req, res) {
-  console.log(req.body)
-  Bookings.find( {$or:[ 
-                      {$and:[ {bookedFrom:{$gte: new Date(req.body.startDate)}}, {bookedTo:{$lte: new Date(req.body.endDate)}}] },
-                      {$and:[ {bookedTo:{$gte: new Date(req.body.startDate)}}, {bookedTo:{$lte: new Date(req.body.endDate)}}] },
-                      {$and:[ {bookedFrom:{$gte: new Date(req.body.startDate)}}, {bookedFrom:{$lte: new Date(req.body.endDate)}}] },
-                      {$and:[ {bookedFrom:{$lte: new Date(req.body.startDate)}}, {bookedTo:{$gte: new Date(req.body.endDate)}}] }
-                ]} , {propertyID: 1, _id: 0}, function(error, bookings) {
-    if (error) {
-      console.log(error);
-      console.log("unable to search database");
-      res.status(400).json({responseMessage: 'unable to search database'});
-    } else {
-      var bookingsArray = [];
-      for(var i in bookings) {
-        bookingsArray.push(bookings[i].propertyID);
-      }
-      if (req.body.bedroomsHigh === 0){
         console.log("in if");
         Properties.find( {$and: [ {_id: {$nin: bookingsArray} }, {city: req.body.city.toLowerCase()}, {startDate: {$lte: Date(req.body.startDate) }}, {endDate: {$gte: Date(req.body.endDate)}}, {sleeps: {$gte: req.body.noOfGuests}}, {$and: [ {baseRate: {$gte: req.body.priceLow}}, {baseRate: {$lte: req.body.priceHigh}} ] } ] }, function(error,result){
           if (error) {
@@ -211,10 +162,26 @@ router.route('/bookings/:id').get(requireAuth, function (req, res) {
 // List Property by owner
 router.route('/owner/propertylistings').post(requireAuth, function (req, res) {
   console.log("req.body:", req.body);
+  
+  var query = {}; // declare the query object
+  query['$and']=[{listedBy:req.body.listedBy}]; // filter the search by any criteria given by the user
+  if( (req.body.fromdate && !req.body.todate) ){
+    console.log("here")
+    query['$and'].push( {startDate: {$gte: req.body.fromdate }});
+  }
+  if( (!req.body.fromdate && req.body.todate) ){
+    query['$and'].push( {endDate: {$lte: req.body.todate}});
+  }
+  if( (req.body.fromdate && req.body.todate) ){
+    query['$and'].push( {startDate: {$lte: req.body.fromdate }}, {endDate: {$gte: req.body.todate} });
+  }
 
-  Properties.find( {listedBy:req.body.listedBy})
+  console.log("query:", query)
+
+  Properties.find( query )
             .limit(req.body.pageLimit)
             .skip(req.body.pageLimit * (req.body.currentPage - 1) )
+            .lean()
             .exec(function(error,result){
     if (error) {
       console.log(error);
@@ -222,6 +189,11 @@ router.route('/owner/propertylistings').post(requireAuth, function (req, res) {
       res.status(400).json({responseMessage: 'Property not found'});
     } else {
       async.eachOfSeries (result, function(value, i, inner_callback) {
+        value.bookedFrom = []
+        value.bookedTo = []
+        value.bookedBy = []
+        value.noOfGuests = []
+        value.price = []
         Bookings.find( { "propertyID": value._id }, function(error, bookings) {
           if (!error){
             if (bookings){
@@ -247,7 +219,7 @@ router.route('/owner/propertylistings').post(requireAuth, function (req, res) {
           console.log(error);
         } else {
           console.log("Property Found");
-          console.log(result.length);
+          //console.log(result);
           res.writeHead(200, {'content-type':'application/json'});
           res.end(JSON.stringify(result));
         }
@@ -284,37 +256,56 @@ router.route('/bookproperty').post(requireAuth, function (req, res) {
 
 // List all trips by a traveller
 router.route('/traveller/triplistings').post(requireAuth, function (req, res) {
-  console.log(req.body.bookedBy);
-  Bookings.find({bookedBy:req.body.bookedBy}, function(error,result){
+  console.log(req.body);
+
+  var query = {}; // declare the query object
+  query['$and']=[{bookedBy:req.body.bookedBy}]; // filter the search by any criteria given by the user
+  if( (req.body.fromdate && !req.body.todate) ){
+    console.log("here")
+    query['$and'].push( {bookedFrom: {$gte: req.body.fromdate }});
+  }
+  if( (!req.body.fromdate && req.body.todate) ){
+    query['$and'].push( {bookedTo: {$lte: req.body.todate}});
+  }
+  if( (req.body.fromdate && req.body.todate) ){
+    query['$and'].push( {bookedFrom: {$lte: req.body.fromdate }}, {bookedTo: {$gte: req.body.todate} });
+  }
+
+  console.log("query:", query,)
+  Bookings.find( query )
+          .limit(req.body.pageLimit)
+          .skip(req.body.pageLimit * (req.body.currentPage - 1) )
+          .lean()
+          .exec(function(error,result){
       if (error) {
         console.log(error);
-        console.log("Property not found");
+        console.log("Trips not found");
         res.status(400).json({responseMessage: 'Property not found'});
       } else {
-        var bookings= [];
         async.eachOfSeries (result, function(value, i, inner_callback) {
           console.log("Property ID: ", value.propertyID)
+          value.propertyDetails= [];
           Properties.find( {_id: value.propertyID}, function(error, property) {
             if (!error){
               if (property){
-                bookings.push(property[0]);
+                value.propertyDetails.push(property[0]);
               }
               inner_callback(null);
             } else {
               console.log(error);
               console.log("Error while performing Query");
               inner_callback(error);
-          }
-        });
+            }
+          });
       }, function (error) {
         if (error) {
           console.log(error);
           console.log("Trips not found");
           res.status(400).json({responseMessage: 'Trips not found'});
         } else {
-          console.log(JSON.stringify(bookings));
+          console.log(JSON.stringify(result.length));
           res.writeHead(200, {'content-type':'application/json'});
-          res.end(JSON.stringify(bookings));
+          res.end(JSON.stringify(result));
           console.log("Trips Found");
         }
       });

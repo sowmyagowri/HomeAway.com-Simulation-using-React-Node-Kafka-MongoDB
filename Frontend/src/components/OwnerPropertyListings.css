@@ -23,7 +23,7 @@
 }
 
 .bgc-fff {
-    background-color: rgb(216, 245, 157)!important;
+    background-color: #dee2e6 !important;
 }
 .box-shad {
     -webkit-box-shadow: 1px 1px 0 rgba(0,0,0,.2);
@@ -250,7 +250,7 @@
     padding-top: 12px;
     padding-bottom: 12px;
     text-align: left;
-    background-color: #4CAF50;
+    background-color: #6c757d;
     color: white;
 }
 
@@ -283,13 +283,15 @@ ul.pagination {
     margin-top: 0;
     margin-bottom: 0;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-  }
-  ul.pagination li.page-item.active a.page-link {
+}
+
+ul.pagination li.page-item.active a.page-link {
     color: #445565 !important;
     background-color: #e3e7eb !important;
     border-color: #ced4da !important;
-  }
-  ul.pagination a.page-link {
+}
+
+ul.pagination a.page-link {
     padding: 0.75rem 1rem;
     min-width: 3.5rem;
     text-align: center;
@@ -298,7 +300,8 @@ ul.pagination {
     color: #6b88a4;
     font-weight: 900;
     font-size: 17px;
-  }
-  ul.pagination a.page-link:hover {
+}
+
+ul.pagination a.page-link:hover {
     background-color: #f4f4f4;
-  }
+}
