@@ -48,6 +48,7 @@ class Profile extends Component{
             console.log(input_email);
             const data = { email : input_email }
             this.props.profilefetch(data, sessionStorage.getItem('jwtToken')).then(response => {
+                console.log("response:", response);
                 if(response.payload.status === 200){
                     this.setState({ profiledata: response.payload.data });
                     this.refs.createdyear.value = this.state.profiledata.created;
@@ -202,6 +203,7 @@ class Profile extends Component{
         if(!cookie.load('cookie1')){
             redirectVar = <Redirect to= "/"/>
         }
+        
         return(
             <div>
                 {redirectVar}
@@ -223,10 +225,10 @@ class Profile extends Component{
                         <div className="btn btn-group" id="white">
                             <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
                             <div className="dropdown-menu">
-                                <a className="dropdown-item" href="#"> <i class="fas fa-envelope"></i> Inbox</a>
-                                <a className="dropdown-item" href="/traveller/mytrips"> <i class="fas fa-briefcase"></i> My Trips</a>
-                                <a className="dropdown-item" href="/Profile"> <i class="fas fa-user"></i> My Profile</a>
-                                <a className="dropdown-item" href="#" onClick= {this.logout}> <i class="fas fa-sign-out-alt"></i> Logout</a>
+                                <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
+                                <a className="dropdown-item" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a>
+                                <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
+                                <a className="dropdown-item"  onClick= {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
                             </div>
                         </div>
                         )
@@ -235,11 +237,11 @@ class Profile extends Component{
                         <div className="btn btn-group" id="white">
                             <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
                             <div className="dropdown-menu">
-                                <a className="dropdown-item" href="#"> <i class="fas fa-envelope"></i> Inbox</a>
-                                <a className="dropdown-item" href="/owner/mylistings"> <i class="fas fa-home"></i> My Listings</a>
-                                <a className="dropdown-item" href="/owner/propertypost"> <i class="fas fa-building"></i> Post Property</a>
-                                <a className="dropdown-item" href="/Profile"> <i class="fas fa-user"></i> My Profile</a>
-                                <a className="dropdown-item" onClick = {this.logout}> <i class="fas fa-sign-out-alt"></i> Logout</a>
+                                <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
+                                <a className="dropdown-item" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a>
+                                <a className="dropdown-item" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a>
+                                <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
+                                <a className="dropdown-item" onClick = {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
                             </div>
                         </div>
                         )
@@ -253,23 +255,23 @@ class Profile extends Component{
                 {(cookie.load('cookie1') === 'travellercookie') 
                 ?
                 (
-                    <div id="conttab" class="container">
+                    <div id="conttab" className="container">
                         <ul id="ulinktab">
-                            <li id="ulinktab" class="one"><a id="linktab" href="#"> <i class="fas fa-envelope"></i> Inbox</a></li>
-                            <li id="ulinktab" class="two"><a id="linktab" href="/traveller/mytrips"> <i class="fas fa-briefcase"></i> My Trips</a></li>
-                            <li id="ulinktab" class="three"><a id="linktab" href="/Profile"> <i class="fas fa-user"></i> My Profile</a></li>
+                            <li id="ulinktab" className="one"><a id="linktab" > <i className="fas fa-envelope"></i> Inbox</a></li>
+                            <li id="ulinktab" className="two"><a id="linktab" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a></li>
+                            <li id="ulinktab" className="three"><a id="linktab" href="/Profile"> <i className="fas fa-user"></i> My Profile</a></li>
                             <hr id="hrtab" />
                         </ul>
                     </div>
                 )
                 :
                 (
-                    <div id="conttab" class="container">
+                    <div id="conttab" className="container">
                         <ul id="ulinktab">
-                            <li id="ulinktab" class="one"><a id="linktab" href="#"> <i class="fas fa-envelope"></i> Inbox</a></li>
-                            <li id="ulinktab" class="two"><a id="linktab" href="/owner/mylistings"> <i class="fas fa-home"></i> My Listings</a></li>
-                            <li id="ulinktab" class="three"><a id="linktab" href="/Profile"> <i class="fas fa-user"></i> My Profile</a></li>
-                            <li id="ulinktab" class="four"><a id="linktab" href="/owner/propertypost"> <i class="fas fa-building"></i> Post Property</a></li>
+                            <li id="ulinktab" className="one"><a id="linktab" > <i className="fas fa-envelope"></i> Inbox</a></li>
+                            <li id="ulinktab" className="two"><a id="linktab" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a></li>
+                            <li id="ulinktab" className="three"><a id="linktab" href="/Profile"> <i className="fas fa-user"></i> My Profile</a></li>
+                            <li id="ulinktab" className="four"><a id="linktab" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a></li>
                             <hr id="hrtab" />
                         </ul>
                     </div>

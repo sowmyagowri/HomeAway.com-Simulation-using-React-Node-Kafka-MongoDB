@@ -192,7 +192,7 @@ class TravellerTripListings extends Component {
             return Object.keys(currentTrips).map((i) => {
                     return <div className="brdr bgc-fff pad-10 box-shad btm-mrg-20 myborder1 property-listing" key={currentTrips[i].ID}>
                     <div className="media">
-                        <a className="pull-left" href="#" target="_parent">
+                        <a className="pull-left"  target="_parent">
                         <img alt="Thumbnail View of Property" className="img-responsive" src={`http://localhost:3001/uploads/${currentTrips[i].propertyDetails[0].image1}`} /></a>
                         <div className="media-body">  
                             <h4 className="myh4" style={{paddingLeft: "10px"}}>{currentTrips[i].propertyDetails[0].headline}</h4>
@@ -259,10 +259,10 @@ class TravellerTripListings extends Component {
                         <div className="btn btn-group" id="white">
                             <button className="dropdown-toggle" style = {{fontSize: "18px", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
                             <div className="dropdown-menu">
-                                <a className="dropdown-item" href="#"> <i className="fas fa-envelope"></i> Inbox</a>
+                                <a className="dropdown-item" href="/Inbox"> <i className="fas fa-envelope"></i> Inbox</a>
                                 <a className="dropdown-item" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a>
                                 <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
-                                <a className="dropdown-item" href="#" onClick= {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
+                                <a className="dropdown-item"  onClick= {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
                             </div>
                         </div>
                         <img style={{marginLeft: "50px"}} src={require('./logo.png')} alt="Homeaway Logo"/>
@@ -271,7 +271,7 @@ class TravellerTripListings extends Component {
                 <div style={{backgroundColor: "white", borderLeftColor:"white",borderRightColor:"white",borderBottomColor: "#d6d7da", borderTopColor: "#d6d7da", borderStyle: "solid"}}>
                     <div id="conttab" className="container">
                         <ul id="ulinktab">
-                            <li id="ulinktab" className="one"><a id="linktab" href="#"> <i className="fas fa-envelope"></i> Inbox</a></li>
+                            <li id="ulinktab" className="one"><a id="linktab" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a></li>
                             <li id="ulinktab" className="two"><a id="linktab" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a></li>
                             <li id="ulinktab" className="three"><a id="linktab" href="/Profile"> <i className="fas fa-user"></i> My Profile</a></li>
                             <hr id="hrtab3" />

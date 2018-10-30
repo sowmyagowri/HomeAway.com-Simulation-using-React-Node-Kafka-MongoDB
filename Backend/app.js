@@ -22,7 +22,7 @@ require('./config/passport').passport;
 // Set up Database connection
 var mongoose = require('mongoose');
 var connStr = config.database_type + '://' + config.database_host + ':' + config.database_port + '/' + config.database_name;
-mongoose.connect(connStr, { useNewUrlParser: true }, function(err) {
+mongoose.connect(connStr, { useNewUrlParser: true, poolSize: 10, }, function(err) {
   if (err) throw err;
   else {
       console.log('Successfully connected to MongoDB');
@@ -57,6 +57,7 @@ app.use(morgan('dev'));
 // Routes and Backend Funcioncalities
 var loginRoutes = require('./src/routes/loginRoutes');
 var propertyRoutes = require('./src/routes/propertyRoutes');
+var emailRoutes = require('./src/routes/emailRoutes');
 
 app.use(express.static('public'));
 
@@ -72,6 +73,7 @@ app.use(bodyParser.json());
 
 app.use(basePath, loginRoutes);
 app.use(basePath, propertyRoutes);
+app.use(basePath, emailRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '/uploads/')));
 
 // Execute App

@@ -12,8 +12,9 @@ import Tab from 'react-web-tabs/lib/Tab';
 import TabPanel from 'react-web-tabs/lib/TabPanel';
 import TabList from 'react-web-tabs/lib/TabList';
 import SweetAlert from 'react-bootstrap-sweetalert';
+import Popup from "reactjs-popup";
 
-import { propertydetails, propertybook } from '../actions';
+import { propertydetails, propertybook, sendmail } from '../actions';
 import { reduxForm } from "redux-form";
 import { connect } from 'react-redux';
 
@@ -32,20 +33,25 @@ class PropertyDetails extends Component {
           bookingFromDate :"",
           bookingToDate :"",
           isLoading : true,
-          requestedDays : 0,
           price : 0,
           propertyDetails: [{}],
           adate : false,
           ddate : false,
           pguests : false,
           alert: null,
-          booked : false
+          booked : false,
+          open: false,
+          mailcontent :"",
         };
         this.logout = this.logout.bind(this);
         this.fromDateChangeHandler = this.fromDateChangeHandler.bind(this);
         this.toDateChangeHandler = this.toDateChangeHandler.bind(this);
         this.noOfGuestsChangeHandler = this.noOfGuestsChangeHandler.bind(this);
         this.submitBooking = this.submitBooking.bind(this);
+        this.openModal = this.openModal.bind(this);
+        this.closeModal = this.closeModal.bind(this);
+        this.handlemessage = this.handlemessage.bind(this);
+
     }
     
     componentWillMount () {
@@ -179,22 +185,85 @@ class PropertyDetails extends Component {
             bookedTo : this.state.bookingToDate,
             NoOfGuests : this.state.guests,
             pricePaid : price
-            }
+        }
 
-            this.props.propertybook(data, sessionStorage.getItem('jwtToken'))
-            .then(response => {
-                console.log("Status Code : ",response.payload.status);
-                if(response.payload.status === 200){
-                    console.log("booked property")
-                    window.close();
-                }
-            });
+        this.props.propertybook(data, sessionStorage.getItem('jwtToken'))
+        .then(response => {
+            console.log("Status Code : ",response.payload.status);
+            if(response.payload.status === 200){
+                console.log("booked property")
+                window.close();
+            }
+        });
     }
+
+    openModal = () => {
+        if (this.state.isTravelerLoggedIn){
+            if (this.state.adate && this.state.ddate && this.state.pguests) {
+                this.setState({ open: true });
+            }
+            else {
+                window.alert("Please enter all the booking info")
+            }
+        } else {
+            window.alert("You must be logged in to message the owner!!!")
+        }
+    };
+
+    closeModal = () => {
+        this.setState({ open: false });
+    };
+
+    handlemessage = (event) => {
+        this.setState ({
+            mailcontent : event.target.value
+        })
+    }
+
+    sendMessage = () => {
+
+        if (this.handleValidation()) {
+
+            if (this.state.adate && this.state.ddate && this.state.pguests && this.state.isTravelerLoggedIn) {
+
+                var data = {
+                    sendername : cookie.load('cookie3') + ' ' + cookie.load('cookie4'),
+                    senderemail : cookie.load('cookie2'),
+                    receiver : this.state.propertyDetails.listedBy,
+                    mailcontent : this.state.mailcontent,
+                    propertyid : this.state.propertyDetails._id,
+                    propertylocated : this.state.propertyDetails.city,
+                    propertyheader : this.state.propertyDetails.headline,
+                    checkin : this.state.bookingFromDate,
+                    checkout : this.state.bookingToDate,
+                    guests : this.state.guests,
+                    reply : false
+                }
+    
+                console.log("send message")
+                this.props.sendmail(data, sessionStorage.getItem('jwtToken')).then(response => {
+                    if(response.payload.status === 200){
+                        console.log(response.payload.data)
+                        this.setState({result : response.payload.data})
+                    }
+                });
+    
+                this.setState({ open: false });
+            } else {
+                if (!this.state.isTravelerLoggedIn){
+                    window.alert("You must be logged in to book this property!!!")
+                }
+                else {
+                    window.alert("Please enter all the fields")
+                }
+            }
+        }
+    };
 
     render(){
 
         if(cookie.load('cookie1') === 'travellercookie'){
-          this.state.isTravelerLoggedIn = true
+            this.setState({ isTravelerLoggedIn: true });
         } 
         const {propertyDetails} = this.state;
 
@@ -211,44 +280,46 @@ class PropertyDetails extends Component {
             <Helmet>
               <style>{'body { background-color: white; }'}</style>
             </Helmet>
-                <Navbar>
+            <Navbar>
                 <Navbar.Header>
                     <Navbar.Brand>
                     <a href="/" title = "HomeAway" className = "logo"><img src={require('./homeaway_logo.png')} alt="Homeaway Logo"/></a>
                     </Navbar.Brand>
                 </Navbar.Header>
-                <div>
-                <img alt="US Flag" src={require('./us_flag.png')}/>
-                    <button id="blue" className="btn" style = {{fontColor : "black", backgroundColor:"white", background:"white", borderColor:"white"}} type="button"><a href="#">Trip Boards</a></button>
+                <div className="box">
+                    <div>
+                        <img style={{marginTop: "13px"}} alt="US Flag" src={require('./us_flag.png')}/>
+                    </div>
+                    <button id="blue" className="btn" style = {{fontColor : "black", backgroundColor:"white", background:"white", borderColor:"white"}} type="button"><a>Trip Boards</a></button>
                     {!this.state.isTravelerLoggedIn 
                     ?
                     (
-                        <div className="btn btn-group" id="white">
-                            <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a href="#">Login</a></button>
-                            <div className="dropdown-menu">
-                                <a className="dropdown-item" href="/traveller/login">Traveller Login</a>
-                                <a className="dropdown-item" href="/owner/login">Owner Login</a>
-                            </div>
+                    <div className="btn btn-group" id="white">
+                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a>Login</a></button>
+                        <div className="dropdown-menu">
+                            <a className="dropdown-item" href="/traveller/login">Traveller Login</a>
+                            <a className="dropdown-item" href="/owner/login">Owner Login</a>
                         </div>
+                    </div>
                     )
                     :
                     (
-                        <div>
-                            <div className="btn btn-group" id="white">
-                                <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
-                                <div className="dropdown-menu">
-                                    <a className="dropdown-item" href="#"> <i class="fas fa-envelope"></i> Inbox</a>
-                                    <a className="dropdown-item" href="/traveller/mytrips"> <i class="fas fa-briefcase"></i> My Trips</a>
-                                    <a className="dropdown-item" href="/Profile"> <i class="fas fa-user"></i> My Profile</a>
-                                    <a className="dropdown-item" href="#" onClick= {this.logout}> <i class="fas fa-sign-out-alt"></i> Logout</a>
-                                </div>
+                    <div>
+                        <div className="btn btn-group" id="white" style = {{marginRight: "160px", width: "50px", }}>
+                            <button className="dropdown-toggle" style = {{color: "#0067db", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                            <div className="dropdown-menu">
+                            <a className="dropdown-item" href="/Profile"> <i className="fas fa-envelope"></i> Inbox</a>
+                            <a className="dropdown-item" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a>
+                            <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
+                            <a className="dropdown-item"  onClick= {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
                             </div>
-                            <img style = {{marginRight: "20px", }} alt="US Flag" src={require('./mailbox.png')}/>
+                        </div>
+                        <img style = {{marginRight: "20px", }} alt="US Flag" src={require('./mailbox.png')}/>
                     </div>
                     )
                     }
                     <button className="btn" style = {{color: "#fff", fontSize: "15px", margin: "0 15px", padding: "12px 40px",fontFamily: "Lato,Arial,Helvetica Neue,sans-serif", height: "40px", backgroundColor:"#fff", width: "200px", borderRadius: "40px", borderColor: "#d3d8de"}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
-                    <a href="/owner/login">List your Property</a>
+                        <a href="/owner/login">List your Property</a>
                     </button>
                     <img src={require('./logo.png')} alt="Homeaway Logo"/>
                 </div>
@@ -256,9 +327,9 @@ class PropertyDetails extends Component {
               <div className="row">
                   <div className="col-md-4 col-md-offset-3">
                       <div className="form-group">
-                        <div class="input-group">
-                            <span class="input-group-prepend">
-                                <div class="input-group-text form-control" ><i class="fa fa-map-marker"></i></div>
+                        <div className="input-group">
+                            <span className="input-group-prepend">
+                                <div className="input-group-text form-control" ><i className="fa fa-map-marker"></i></div>
                             </span>
                             <input type="text" style ={{height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control" name="search" id="search" defaultValue = {this.state.location} readOnly/>
                         </div>
@@ -276,9 +347,9 @@ class PropertyDetails extends Component {
                   </div>
                   <div className="col-md-offset-3" style = {{marginLeft: "13px"}}>
                       <div className="form-group">
-                        <div class="input-group">
-                            <span class="input-group-prepend">
-                                <div class="input-group-text form-control" ><i class="fa fa-user-friends"></i></div>
+                        <div className="input-group">
+                            <span className="input-group-prepend">
+                                <div className="input-group-text form-control" ><i className="fa fa-user-friends"></i></div>
                             </span>
                             <input type="text" style ={{height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control" value= {this.state.noOfGuests} readOnly/>
                         </div>
@@ -293,12 +364,10 @@ class PropertyDetails extends Component {
                         <div className="form-group col-sm-8 FixedHeightContainer border" id = "property-listings" style ={{maxWidth : "1000px"}}>
                             <div style = {{background: "#D6EBF2"}}  className ="Content">
                                 <Carousel showThumbs={false}>
-                                
                                     <div>
                                         <img className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails.image1}`} />
                                     </div>
-                                
-                                <div>
+                                    <div>
                                         <img className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails.image2}`} />
                                     </div>
                                     <div>
@@ -307,12 +376,10 @@ class PropertyDetails extends Component {
                                     <div>
                                         <img className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails.image4}`} />
                                     </div>
-                                <div>
+                                    <div>
                                         <img className="img-responsive" src={`http://localhost:3001/uploads/${propertyDetails.image5}`} />
                                     </div>
-                                
                                 </Carousel>
-
                                 <div>
                                     <Tabs defaultTab="one"
                                         onChange={(tabID) => { console.log(tabID)}}>
@@ -372,45 +439,45 @@ class PropertyDetails extends Component {
                             <div className = "container" style = {{marginTop : "30px"}}>
                                 <div className="row">
                                     <div className="col-md-offset-3">
-                                        <div className="form-group" style = {{fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
+                                        <div className="form-group" style = {{marginLeft : "50px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
                                             <h5>Arrive</h5>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="row">
                                     <div className="col-md-offset-6">
-                                        <div className="form-group card" style = {{fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
+                                        <div className="form-group card" style = {{marginLeft : "50px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
                                         <input placeholder="Arrive" onChange={this.fromDateChangeHandler} style = {{height: "40px", width: "180px"}} value={this.state.bookingFromDate} type="date" name="fromdate"/>
                                         </div>
                                     </div>
                                 </div>
                                 <div className = "row">
                                     <div className="col-md-offset-3">
-                                        <div className="form-group " style = {{fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
+                                        <div className="form-group " style = {{marginLeft : "50px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
                                             <h5>Depart</h5>
                                         </div>
                                     </div>
                                 </div>
                                 <div className = "row">
                                     <div className="col-md-offset-6">
-                                        <div className="form-group card" style = {{ fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
+                                        <div className="form-group card" style = {{marginLeft : "50px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
                                      <input placeholder="Depart" onChange={this.toDateChangeHandler} style = {{height: "40px", width : "180px"}} value={this.state.bookingToDate} type="date" name="todate"/>
                                         </div>
                                     </div>
                                 </div>
                                 <div className = "row">
                                     <div className="col-md-offset-3">
-                                        <div className="form-group " style = {{fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
+                                        <div className="form-group " style = {{marginLeft : "50px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
                                             <h5>No of Guests</h5>
                                         </div>
                                     </div>
                                 </div>
                                 <div className = "row">
-                                    <div className="col-md-8">
-                                        <div className="form-group card" style = {{height: "50px", width: "180px",  marginLeft : "-9px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
-                                            <div class="input-group">
-                                                <span class="input-group-prepend">
-                                                    <div class="input-group-text form-control" ><i class="fa fa-user-friends"></i></div>
+                                    <div className="col-md-8" style={{marginLeft : "50px"}}>
+                                        <div className="form-group card" style = {{width: "180px",  marginLeft : "-9px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
+                                            <div className="input-group" style={{height: "50px"}}>
+                                                <span className="input-group-prepend">
+                                                    <div className="input-group-text form-control" ><i className="fa fa-user-friends"></i></div>
                                                 </span>
                                                 <input type="text" style ={{height: "49px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control"
                                                 value={this.state.guests} onChange = {this.noOfGuestsChangeHandler} min="1"/>
@@ -418,39 +485,90 @@ class PropertyDetails extends Component {
                                         </div>
                                     </div>
                                 </div>
-                                    {(this.state.adate  && this.state.ddate && this.state.pguests ?
-                                            <div className = "row">
-                                                <div className="col-md-offset-3">
-                                                    <div className="form-group " style = {{fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
-                                                        <h5>Price for {difference} nights is ${this.state.price}</h5>
-                                                    </div>
+                                {(this.state.adate  && this.state.ddate && this.state.pguests ?
+                                        <div className = "row">
+                                            <div className="col-md-offset-3">
+                                                <div className="form-group " style = {{fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
+                                                    <h5>Price for {difference} nights is ${this.state.price}</h5>
                                                 </div>
                                             </div>
-                                    :
-                                    null
-                                    )}
-                                    <div className="form-group" style ={{marginLeft : "50px", marginTop : "40px"}}>
-                                        <button className="btn btn-primary" onClick = {this.submitBooking} style = {{ height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "200px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
-                                            Book Now
-                                        </button>
-                                        {this.state.alert}
-                                    </div>
+                                        </div>
+                                :
+                                null
+                                )}
+                                <div className="form-group" style ={{marginLeft : "50px", marginTop : "40px"}}>
+                                    <button className="btn btn-primary" onClick = {this.submitBooking} style = {{ height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "200px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
+                                        Book Now
+                                    </button>
+                                    {this.state.alert}
+                                </div>
+                                <hr/>
+                                <button id="blue" className="btn" onClick={this.openModal} style = {{marginLeft : "50px", fontColor : "black", backgroundColor:"white", background:"transparent", borderColor:"transparent"}} type="button"><a >Ask Manager a Question</a></button>
+                                    <Popup open={this.state.open} closeOnDocumentClick onClose={this.closeModal}>
+                                            <div>
+                                                <div className="modal1">
+                                                    <a className="close" onClick={this.closeModal}>&times;</a>
+                                                        <div className="header" style = {{marginTop : "30px"}}><h2>Ask Owner a Question</h2></div>
+                                                            <hr/>
+                                                            <div className="content">
+                                                                <div className="row">
+                                                                    <div id="floatContainer1" className="col-md-3 float-container">
+                                                                        <label htmlFor="floatField4">Arrive</label>
+                                                                        <input id="adate" value = {this.state.bookingFromDate} name="adate" readOnly type="text"/>
+                                                                    </div>
+                                                                    <div id="floatContainer1" className = "col-md-3 float-container" style = {{marginLeft: "10px"}}>
+                                                                        <label htmlFor="floatField5">Depart</label>
+                                                                        <input id="ddate" value = {this.state.bookingToDate} name="ddate" readOnly type="text"/>
+                                                                    </div>
+                                                                    <div id="floatContainer1" className="col-md-3 float-container" style = {{marginLeft: "10px", width: "50px"}}>
+                                                                        <label htmlFor="floatField6">Guests</label>
+                                                                        <input id="guests" value = {this.state.guests} name="guests" readOnly type="text"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="row">
+                                                                    <div id="floatContainer1" className="float-container">
+                                                                        <label htmlFor="floatField1">First Name</label>
+                                                                        <input id="firstname" value = {cookie.load('cookie3')} name="firstname"readOnly type="text"/>
+                                                                    </div>
+                                                                    <div id="floatContainer1" className="float-container">
+                                                                        <label htmlFor="floatField2">Last Name</label>
+                                                                        <input id="firstname" value = {cookie.load('cookie4')} name="lastname"  readOnly type="text"/>
+                                                                    </div>
+                                                                    <div id="floatContainer1" className="float-container">
+                                                                        <label htmlFor="floatField3">Email Address</label>
+                                                                        <input id="emailaddress" value = {cookie.load('cookie2')} name="email" readOnly type="text"/>
+                                                                    </div>
+                                                                    <div className="float-container1">
+                                                                        <textarea id="message"  onChange = {this.handlemessage} cols="40" rows="5" placeholder="Message to Owner" className="form-control"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <button className="btn btn-primary" onClick = {this.sendMessage} style = {{ height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "120px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
+                                                            Send
+                                                        </button>
+                                                        </div>
+                                                       
+                                                </div>
+                                        </Popup>
                                 </div>
                             </div>
                         </div>
                     </div>
-                 </div>
+                </div>
             </div>
         </div>
-
     )
     }
 }
   
 function mapStateToProps(state) {
-    return { propertydetails: state.propertydetails, propertybook: state.propertybook };
+    return { 
+        propertydetails: state.propertydetails,
+        propertybook: state.propertybook,
+        sendmailtoowner: state.sendmailtoowner,
+    };
 }
 
 export default reduxForm({
     form: "PropertyDetailsForm"
-  })(connect(mapStateToProps, {propertydetails, propertybook}) (PropertyDetails) );
+  })(connect(mapStateToProps, {propertydetails, propertybook, sendmail}) (PropertyDetails) );

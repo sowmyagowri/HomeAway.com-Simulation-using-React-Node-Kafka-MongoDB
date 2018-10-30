@@ -297,14 +297,14 @@ render(){
       <Navbar inverse collapseOnSelect>
           <Navbar.Header>
             <Navbar.Brand>
-              <a href="#" title = "HomeAway" className = "logo"><img alt="Homeaway Logo" src={require('./homeaway_logo.png')}/></a>
+              <a  title = "HomeAway" className = "logo"><img alt="Homeaway Logo" src={require('./homeaway_logo.png')}/></a>
             </Navbar.Brand>
           </Navbar.Header>
         <div>
            <div className="btn btn-group" id="white">
              <button className="dropdown-toggle"  style = {{fontSize: "18px",  backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {this.state.name}</button>
              <div className="dropdown-menu">
-                <a className="dropdown-item" href="#"> <i className="fas fa-envelope"></i> Inbox</a>
+                <a className="dropdown-item" > <i className="fas fa-envelope"></i> Inbox</a>
                 <a className="dropdown-item" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a>
                 <a className="dropdown-item" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a>
                 <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
@@ -315,12 +315,12 @@ render(){
         </div>
       </Navbar>
       <div style={{backgroundColor: "white", borderLeftColor:"white",borderRightColor:"white",borderBottomColor: "#d6d7da", borderTopColor: "#d6d7da", borderStyle: "solid"}}>
-        <div id="conttab" class="container">
+        <div id="conttab" className="container">
             <ul id="ulinktab">
-                <li id="ulinktab" class="one"><a id="linktab" href="#"> <i class="fas fa-envelope"></i> Inbox</a></li>
-                <li id="ulinktab" class="two"><a id="linktab" href="/owner/mylistings"> <i class="fas fa-home"></i> My Listings</a></li>
-                <li id="ulinktab" class="three"><a id="linktab" href="/Profile"> <i class="fas fa-user"></i> My Profile</a></li>
-                <li id="ulinktab" class="four"><a id="linktab" href="/owner/propertypost"> <i class="fas fa-building"></i> Post Property</a></li>
+                <li id="ulinktab" className="one"><a id="linktab" > <i className="fas fa-envelope"></i> Inbox</a></li>
+                <li id="ulinktab" className="two"><a id="linktab" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a></li>
+                <li id="ulinktab" className="three"><a id="linktab" href="/Profile"> <i className="fas fa-user"></i> My Profile</a></li>
+                <li id="ulinktab" className="four"><a id="linktab" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a></li>
                 <hr id="hrtab2" />
             </ul>
         </div>

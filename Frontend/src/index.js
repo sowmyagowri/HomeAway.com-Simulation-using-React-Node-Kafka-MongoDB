@@ -15,6 +15,7 @@ import TravellerSignup1 from './components/TravellerSignup1';
 import TravellerSignup2 from './components/TravellerSignup2';
 import OwnerSignup1 from './components/OwnerSignup1';
 import OwnerSignup2 from './components/OwnerSignup2';
+import Inbox from './components/Inbox';
 
 import Profile from './components/Profile';
 
@@ -54,6 +55,7 @@ ReactDOM.render(
             <Route path='/owner/signup2' component={OwnerSignup2} />
             <Route path='/owner/propertypost' component={OwnerPropertyPost} />
             <Route path='/owner/mylistings' component={OwnerPropertyListings} />
+            <Route path='/inbox' component={Inbox} />
           </div>
         </Router>
       </Provider>

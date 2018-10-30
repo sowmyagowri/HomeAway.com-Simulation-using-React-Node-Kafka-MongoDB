@@ -1,10 +1,7 @@
 //Libraries
 var express = require('express');
 var router = express.Router();
-
-var crypt = require('../models/bcrypt.js');
-var Users = require('../models/UserSchema');
-
+var kafka = require('../routes/kafka/client');
 var config = require('../../config/settings');
 
 // Set up middleware
@@ -19,37 +16,33 @@ router.route('/traveller/login').post(function (req, res) {
   var lowercaseemail = email.toLowerCase();
   var trimemail = lowercaseemail.trim();
   
-  Users.findOne({email:trimemail}, function(err,user){
-    if (err) {
-      console.log(err);
-      console.log("unable to read the database");
+  kafka.make_request('login_topic',{"path":"travellerlogin", "trimemail": trimemail, "password":req.body.password}, function(err,result){
+    if(err){
       res.status(400).json({responseMessage: 'unable to read the users database'});
-    } else if (user) {
-      //printSchema(user, "");
-      crypt.compareHash(req.body.password, user.password, function (err, isMatch) {
-        if (isMatch && !err) {
-          // Create token if the password matched and no error was thrown
-          var token = jwt.sign({ id: user._id, email: user.email }, config.secret_key, {
-            expiresIn: 7200 // expires in 2 hours
-          });
-          res.cookie('cookie1',"travellercookie",{maxAge: 900000, httpOnly: false, path : '/'});
-          res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
-          res.cookie('cookie3',user.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-          res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
-          req.session.user = user.email;
-          //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
-          res.status(200).json({responseMessage: 'Login Successful', token: 'JWT ' + token});
-          console.log("Traveller found in DB");
-        } else {
-          res.status(401).json({responseMessage: 'Authentication failed. Passwords did not match.'})
-          console.log("Authentication failed. Passwords did not match.");
-        }
-      })
-    } else {
+    }
+    else if (result.status === 200)
+    {
+      console.log("result:", result);
+      // Create token if the password matched and no error was thrown
+      var token = jwt.sign({ id: result.user._id, email: result.user.email }, config.secret_key, {
+        expiresIn: 7200 // expires in 2 hours
+      });
+      res.cookie('cookie1',"travellercookie",{maxAge: 900000, httpOnly: false, path : '/'});
+      res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
+      res.cookie('cookie3',result.user.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
+      res.cookie('cookie4',result.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
+      req.session.user = result.user.email;
+      //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
+      res.status(200).json({responseMessage: 'Login Successful', token: 'JWT ' + token});
+      console.log("Traveller found in DB");
+    } else if (result.status === 401){
+      res.status(401).json({responseMessage: 'Authentication failed. Passwords did not match.'})
+      console.log("Authentication failed. Passwords did not match.");
+    } else if (result.status === 402){
       res.status(402).json({responseMessage: 'Authentication failed. User does not exist.'})
       console.log("Authentication failed. User does not exist.");
     }
-  })
+  });
 })
 
 // Validate owner login user details and get a JSON Web Token to include in the header of future requests.
@@ -59,35 +52,38 @@ router.route('/owner/login').post(function (req, res) {
   var lowercaseemail = email.toLowerCase();
   var trimemail = lowercaseemail.trim();
   
-  Users.findOne({email:trimemail, isOwner: 'Y'}, function(err,user){
+  kafka.make_request('login_topic',{"path":"ownerlogin", "trimemail": trimemail, "password":req.body.password}, function(err,result){
     if (err) {
-        console.log(Err);
-    } else if (user) {
-        crypt.compareHash(req.body.password, user.password, function (err, isMatch) {
-          if (isMatch && !err && user.isOwner == 'Y') {
-            // Create token if the password matched and no error was thrown
-            var token = jwt.sign({ id: user._id, email: user.email }, config.secret_key, {
-              expiresIn: 7200 // expires in 2 hours
-            });
-            res.cookie('cookie1',"ownercookie",{maxAge: 900000, httpOnly: false, path : '/'});
-            res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
-            res.cookie('cookie3',user.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-            res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
-            req.session.user = user.email;
-            //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
-            res.status(200).json({responseMessage: 'Login Successful', token: 'JWT ' + token});
-            console.log("Owner found in DB and token is", token);
-          } else {
-            res.status(401).json({responseMessage: 'Authentication failed. Passwords did not match.'})
-            console.log("Authentication failed. Passwords did not match.");
-          }
-        })
-      } else {
-        res.status(402).json({responseMessage: 'Authentication failed. Owner Profile does not exist.'});
-        console.log("Authentication failed. Owner Profile does not exist.");
-      }
-    })
-  });
+        res.status(400).json({responseMessage: 'Database Error'});
+    }
+    else if (result.status === 200)
+    {
+      console.log("result:", result);
+      // Create token if the password matched and no error was thrown
+      var token = jwt.sign({ id: result.user._id, email: result.user.email }, config.secret_key, {
+        expiresIn: 7200 // expires in 2 hours
+      });
+      // Create token if the password matched and no error was thrown
+      var token = jwt.sign({ id: result.user._id, email: result.user.email }, config.secret_key, {
+        expiresIn: 7200 // expires in 2 hours
+      });
+      res.cookie('cookie1',"ownercookie",{maxAge: 900000, httpOnly: false, path : '/'});
+      res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
+      res.cookie('cookie3',result.user.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
+      res.cookie('cookie4',result.user.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
+      req.session.user = result.user.email;
+      //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
+      res.status(200).json({responseMessage: 'Login Successful', token: 'JWT ' + token});
+      console.log("Owner found in DB and token is", token);
+    } else if (result.status === 401){
+      res.status(401).json({responseMessage: 'Authentication failed. Passwords did not match.'})
+      console.log("Authentication failed. Passwords did not match.");
+    } else if (result.status === 402){
+      res.status(402).json({responseMessage: 'Authentication failed. User does not exist.'})
+      console.log("Authentication failed. User does not exist.");
+    }
+  })
+});
 
 // Add traveller users and get a JSON Web Token to include in the header of future requests.
 router.route('/traveller/signup').post(function (req, res) {
@@ -95,49 +91,27 @@ router.route('/traveller/signup').post(function (req, res) {
   console.log(req.body);
   email = req.body.email.toLowerCase();
   trimemail = email.trim();
-  var today = new Date();
-  var year = today.getFullYear();
   
-  Users.findOne({email:trimemail}, function(err,rows){
-    if (err){
-        console.log(err);
-        console.log("unable to read the database");
-        res.status(400).json({responseMessage: 'unable to read the users database'});
-    } else {
-      if (rows) {
-        console.log("User already exists");
-        res.status(400).json({responseMessage: 'User already exists'});
-      } else {
-        crypt.createHash(req.body.password, function (response) {
-          encryptedPassword = response;
-          var userData = {
-            "firstname": req.body.firstname,
-            "lastname": req.body.lastname,
-            "email": trimemail,
-            "password": encryptedPassword,
-            "created": year
-          }
-        
-          //Save the user in database
-          Users.create( userData, function (err,user) {
-            if (err) {
-            console.log("unable to insert into database", err);
-            res.status(400).send("unable to insert into database");
-          } else {
-            console.log("User Added");
-            // Create token if the password matched and no error was thrown
-            var token = jwt.sign({ id: user._id, email: user.email }, config.secret_key, {
-              expiresIn: 7200 // expires in 2 hours
-            });
-            res.cookie('cookie1',"travellercookie",{maxAge: 900000, httpOnly: false, path : '/'});
-            res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
-            res.cookie('cookie3',req.body.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-            res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
-            //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
-            res.status(200).json({responseMessage: 'User Added', token: 'JWT ' + token});
-          }});
-        })
-      }
+  kafka.make_request('login_topic',{"path":"travellersignup", "trimemail": trimemail, "body": req.body}, function(err,result){
+    if (err) {
+      res.status(400).json({responseMessage: 'Database Error'});
+    }
+    else if (result.status === 200)
+    {
+      console.log("User Added");
+      // Create token if the password matched and no error was thrown
+      var token = jwt.sign({ id: result.user._id, email: result.user.email }, config.secret_key, {
+        expiresIn: 7200 // expires in 2 hours
+      });
+      res.cookie('cookie1',"travellercookie",{maxAge: 900000, httpOnly: false, path : '/'});
+      res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
+      res.cookie('cookie3',req.body.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
+      res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
+      //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
+      res.status(200).json({responseMessage: 'User Added', token: 'JWT ' + token});
+    } else if (result.status === 401){
+      console.log("User already exists");
+      res.status(401).json({responseMessage: 'User already exists'})
     }
   });
 });
@@ -150,73 +124,39 @@ router.route('/owner/signup').post(function (req, res) {
   var today = new Date();
   var year = today.getFullYear();
   
-  Users.findOne({email:trimemail}, function(err,rows){
+  kafka.make_request('login_topic',{"path":"ownersignup", "trimemail": trimemail, "body": req.body}, function(err,result){
     if (err){
         console.log(err);
-        console.log("unable to read the database");
-        res.status(400).json({responseMessage: 'unable to read the users database'});
-    } else {
-      if (rows) {
-        if (rows.isOwner == 'Y') {
-          console.log("Owner already exists");
-          res.status(400).json({responseMessage: 'Owner already exists'});
-        } else{
-
-          //Update traveller as owner in database
-          Users.findOneAndUpdate({email:trimemail}, {isOwner:'Y'}, function(err,user){
-            if (err) {
-              console.log(err);
-              console.log("unable to update user to owner");
-              res.status(400).json({responseMessage: 'unable to update user to owner'});
-            } else{
-              // Create token if the password matched and no error was thrown
-              var token = jwt.sign({ id: user._id, email: user.email }, config.secret_key, {
-                expiresIn: 7200 // expires in 2 hours
-              });
-              console.log("Owner profile added to traveller login");
-              res.cookie('cookie1',"ownercookie",{maxAge: 900000, httpOnly: false, path : '/'});
-              res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
-              res.cookie('cookie3',rows.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-              res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
-              //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
-              res.status(201).json({responseMessage: 'Owner profile added to traveller login', token: 'JWT ' + token});
-            }
-          })
-        }
-      } else {
-        crypt.createHash(req.body.password, function (response) {
-          encryptedPassword = response;
-      
-          var userData = {
-            "firstname": req.body.firstname,
-            "lastname": req.body.lastname,
-            "email": trimemail,
-            "password": encryptedPassword,
-            "created": year,
-            "isOwner": 'Y'
-          }
-      
-          //Save the user as owner in database
-          Users.create( userData, function (err,user) {
-          if (err) {
-            console.log("unable to insert into database");
-            res.status(400).json({responseMessage: 'unable to insert into users database'});
-          } else {
-            console.log("Owner Added");
-            // Create token if the password matched and no error was thrown
-            var token = jwt.sign({ id: user._id, email: user.email }, config.secret_key, {
-              expiresIn: 7200 // expires in 2 hours
-            });
-            res.cookie('cookie1',"ownercookie",{maxAge: 900000, httpOnly: false, path : '/'});
-            res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
-            res.cookie('cookie3',req.body.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-            res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
-            //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
-            res.status(200).json({responseMessage: 'Owner Added', token: 'JWT ' + token});
-          }});
-        })
+        console.log("Database Error");
+        res.status(400).json({responseMessage: 'Database Error'});
+    } else if (result.status === 400) {
+        console.log("Owner already exists");
+        res.status(400).json({responseMessage: 'Owner already exists'});
+      } else if (result.status === 201) {
+        // Create token if the password matched and no error was thrown
+        var token = jwt.sign({ id: result.user._id, email: result.user.email }, config.secret_key, {
+          expiresIn: 7200 // expires in 2 hours
+        });
+        console.log("Owner profile added to traveller login");
+        res.cookie('cookie1',"ownercookie",{maxAge: 900000, httpOnly: false, path : '/'});
+        res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
+        res.cookie('cookie3',req.body.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
+        res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
+        //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
+        res.status(201).json({responseMessage: 'Owner profile added to traveller login', token: 'JWT ' + token});
+      } else if (result.status === 200) {
+        console.log("Owner Added");
+        // Create token if the password matched and no error was thrown
+        var token = jwt.sign({ id: user._id, email: user.email }, config.secret_key, {
+          expiresIn: 7200 // expires in 2 hours
+        });
+        res.cookie('cookie1',"ownercookie",{maxAge: 900000, httpOnly: false, path : '/'});
+        res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
+        res.cookie('cookie3',req.body.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
+        res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
+        //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
+        res.status(200).json({responseMessage: 'Owner Added', token: 'JWT ' + token});
       }
-    }
   })
 });
 
@@ -224,14 +164,14 @@ router.route('/owner/signup').post(function (req, res) {
 router.route('/profile').post(requireAuth, function (req, res) {
   console.log("Inside Profile fetch");
   var input_email = req.body.email;
-  Users.findOne({email:input_email}, function(err,result){
+  kafka.make_request('login_topic',{"path":"profilefetch", "input_email": input_email}, function(err,result){
     if (err){
       console.log(err);
       res.status(400).json({responseMessage: 'User not found'});
-    }else {
-      console.log("Profile Details:" , result);
+    } else {
+      console.log("Profile Details:", result.user);
       res.writeHead(200, {'content-type':'application/json'});
-      res.end(JSON.stringify(result));
+      res.end(JSON.stringify(result.user));
     }
   })
 });
@@ -258,15 +198,15 @@ router.route('/profilesave').post(requireAuth, function (req, res) {
   }
 
   console.log(userData);
-  Users.findOneAndUpdate({email:trimemail}, userData, {returnNewDocument: true} , function(err,result){
-    if (err) {
-      console.log(err);
+  kafka.make_request('login_topic',{"path": "profilesave", "input_email": trimemail, "userData": userData}, function(error,result){
+    if (error) {
+      console.log(error);
       console.log("unable to update database");
       res.status(400).json({responseMessage: 'unable to update database'});
     } else {
       console.log(result);
       res.writeHead(200, {'content-type':'application/json'});
-      res.end(JSON.stringify(result));
+      res.end(JSON.stringify(result.user));
     }
   })
 });

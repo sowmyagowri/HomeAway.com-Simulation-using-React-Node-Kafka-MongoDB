@@ -167,6 +167,7 @@ class OwnerPropertyListings extends Component {
             if(response.payload.status === 200){
                 console.log(response.payload.data)
                 const allListings = response.payload.data;
+                console.log(allListings);
                 this.setState({
                     allListings,
                     detailsFetched: true
@@ -187,7 +188,7 @@ class OwnerPropertyListings extends Component {
             return Object.keys(currentListings).map((i) => {
                     return <div className="brdr bgc-fff pad-10 box-shad btm-mrg-20 myborder1 property-listing" key={currentListings[i].ID}>
                     <div className="media">
-                        <a className="pull-left" href="#" target="_parent">
+                        <a className="pull-left"  target="_parent">
                         <img alt="Thumbnail View of Property" className="img-responsive" src={`http://localhost:3001/uploads/${currentListings[i].image1}`} /></a>
                         <div className="media-body">  
                             <h4 className="myh4" style={{paddingLeft: "10px"}}>{currentListings[i].headline}</h4>
@@ -203,15 +204,15 @@ class OwnerPropertyListings extends Component {
                             </ul>
     
                             <ul className="list-inline" style={{paddingLeft: "10px"}}>
-                                <li className = "list-inline-item"><i class="fas fa-home"></i></li>
+                                <li className = "list-inline-item"><i className="fas fa-home"></i></li>
                                 <li className = "list-inline-item">{currentListings[i].propertyType}</li>
-                                <li className = "list-inline-item"><i class="fas fa-bed"></i></li>
+                                <li className = "list-inline-item"><i className="fas fa-bed"></i></li>
                                 <li className = "list-inline-item"> {currentListings[i].bedrooms} BR</li>
-                                <li className = "list-inline-item"><i class="fas fa-bath"></i></li>
+                                <li className = "list-inline-item"><i className="fas fa-bath"></i></li>
                                 <li className = "list-inline-item"> {currentListings[i].bathrooms} BA</li>
-                                <li className = "list-inline-item"> <i class="fas fa-user"></i></li>
+                                <li className = "list-inline-item"> <i className="fas fa-user"></i></li>
                                 <li className = "list-inline-item"> Sleeps {currentListings[i].sleeps}</li>
-                                <li className = "list-inline-item"><i class="fa fa-calendar"></i></li>
+                                <li className = "list-inline-item"><i className="fa fa-calendar"></i></li>
                                 <li className = "list-inline-item"> Min Stay {currentListings[i].minStay}</li>
                             </ul>
     
@@ -278,6 +279,7 @@ class OwnerPropertyListings extends Component {
     render(){
         
         const { currentPage, totalPages, allListings, refreshListings} = this.state;
+        console.log("allListings:", allListings);
         const totalListings = allListings.length;
         console.log("render", totalListings);
         let redirectVar = null;
@@ -292,14 +294,14 @@ class OwnerPropertyListings extends Component {
                 <Navbar inverse collapseOnSelect>
                     <Navbar.Header>
                         <Navbar.Brand>
-                            <a href="#" title = "HomeAway" className = "logo"><img alt="Homeaway Logo" src={require('./homeaway_logo.png')}/></a>
+                            <a  title = "HomeAway" className = "logo"><img alt="Homeaway Logo" src={require('./homeaway_logo.png')}/></a>
                         </Navbar.Brand>
                     </Navbar.Header>
                     <div>
                         <div id="white" className="btn btn-group">
                             <button className="dropdown-toggle"  style = {{fontSize: "18px",backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
                             <div className="dropdown-menu">
-                                <a className="dropdown-item" href="#"> <i className="fas fa-envelope"></i> Inbox</a>
+                                <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
                                 <a className="dropdown-item" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a>
                                 <a className="dropdown-item" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a>
                                 <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
@@ -312,7 +314,7 @@ class OwnerPropertyListings extends Component {
                 <div style={{backgroundColor: "white", borderLeftColor:"white",borderRightColor:"white",borderBottomColor: "#d6d7da", borderTopColor: "#d6d7da", borderStyle: "solid"}}>
                     <div id="conttab" className="container">
                         <ul id="ulinktab">
-                            <li id="ulinktab" className="one"><a id="linktab" href="#"> <i className="fas fa-envelope"></i> Inbox</a></li>
+                            <li id="ulinktab" className="one"><a id="linktab" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a></li>
                             <li id="ulinktab" className="two"><a id="linktab" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a></li>
                             <li id="ulinktab" className="three"><a id="linktab" href="/Profile"> <i className="fas fa-user"></i> My Profile</a></li>
                             <li id="ulinktab" className="four"><a id="linktab" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a></li>
@@ -326,7 +328,7 @@ class OwnerPropertyListings extends Component {
                             <div className="form-group">
                                 <div className="input-group">
                                 <span className="input-group-prepend">
-                                    <div className="input-group-text form-control" ><i class="fas fa-heading"></i></div>
+                                    <div className="input-group-text form-control" ><i className="fas fa-heading"></i></div>
                                 </span>
                                 <input type="text" style ={{height: "50px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control" name="searchString" id="home" placeholder="Property Headline Search..." onChange = {this.changeHandler} value={this.state.searchString}/>
                                 </div>

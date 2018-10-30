@@ -24,49 +24,49 @@ class OwnerSignup1 extends Component{
                     </Navbar.Header>
                     <img src={require('./logo.png')} alt="Homeaway Logo"/>
                 </Navbar>
-                <div class="container">
+                <div className="container">
                 <p></p>
                 </div>
-                <div class="container">
+                <div className="container">
                 <p></p>
                 </div>
-                <div class="container">
+                <div className="container">
                 <p></p>
                 </div>
-                <div class="container">
+                <div className="container">
                 <p></p>
                 </div>
-                <div class="container">
+                <div className="container">
                 <p></p>
                 </div>
-                <div class="container">
+                <div className="container">
                 <p></p>
                 </div>
-                <div class="center">
+                <div className="center">
                     <div id="yourdiv">
-                        <h1 class="display-5">Sign Up for HomeAway<br></br></h1>
-                        <h2><small>	Already have an account? <a class="bg-default" href="/owner/login">Log in</a></small>	</h2>
+                        <h1 className="display-5">Sign Up for HomeAway<br></br></h1>
+                        <h2><small>	Already have an account? <a className="bg-default" href="/owner/login">Log in</a></small>	</h2>
                     </div>
                 </div>
-                <div class="container">
-                <div class="col-sm-6 col-sm-offset-6" style={{left: "400px"}}>
-                        <div class="login-form">
+                <div className="container">
+                <div className="col-sm-6 col-sm-offset-6" style={{left: "400px"}}>
+                        <div className="login-form">
                             <br></br>
-                            <a href="/owner/signup2"><button class="btn btn-warning" style={{width:"100%"}}>Sign Up with Email</button></a>
+                            <a href="/owner/signup2"><button className="btn btn-warning" style={{width:"100%"}}>Sign Up with Email</button></a>
                             <br></br>
-                            <div class="mydiv">
-                                <span class="myspan">or</span>
+                            <div className="mydiv">
+                                <span className="myspan">or</span>
                             </div>
                             <br></br>
                             <div>
-                            <button class="mybtn facebook_button">Log in with Facebook</button>
+                            <button className="mybtn facebook_button">Log in with Facebook</button>
                             </div>
                             <br></br>
                             <div>
                             <button className="mybtn google_button" >Log in with Google</button>
                             </div>
                             <br></br>
-                            <div class="center" id= "yourdiv">
+                            <div className="center" id= "yourdiv">
                             <font size="1">We don't post anything without your permission.
                             <br></br>
                             By creating an account you are accepting our Terms and Conditions and Privacy Policy.
@@ -77,7 +77,7 @@ class OwnerSignup1 extends Component{
                     </div>
                 </div>
                 <br></br>
-                <div class="center" id= "yourdiv">
+                <div className="center" id= "yourdiv">
                 <font size="1">Use of this Web site constitutes acceptance of the HomeAway.com Terms and Conditions and Privacy Policy.
                     <br></br>
                     ©2018 HomeAway. All rights reserved.</font>

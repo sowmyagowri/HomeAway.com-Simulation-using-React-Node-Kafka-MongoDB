@@ -170,13 +170,13 @@ class Home extends Component {
                   <div id="white" className="btn btn-group" style = {{marginRight: "160px", width: "50px", }}>
                     <button className="dropdown-toggle" style = {{color: "white", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
                     <div className="dropdown-menu">
-                      <a className="dropdown-item" href="/Profile"> <i className="fas fa-envelope"></i> Inbox</a>
+                      <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
                       <a className="dropdown-item" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a>
                       <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
-                      <a className="dropdown-item" href="#" onClick= {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
+                      <a className="dropdown-item"  onClick= {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                   </div>
-                <img style = {{marginRight: "20px", }} alt="US Flag" src={require('./mailbox.png')}/>
+                  <a href="/inbox" title = "HomeAway" className = "logo"><img style = {{marginRight: "20px", }} alt="Mailbox" src={require('./mailbox.png')}/></a>
                 </div>
                 )
              }

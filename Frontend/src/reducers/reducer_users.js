@@ -27,6 +27,8 @@ export function authentication(state = {}, action) {
       return action.payload;
     case userConstants.PROPERTY_LIST:
       return action.payload;
+    case userConstants.SEND_MAIL:
+      return action.payload;
     default:
       return state;
   }

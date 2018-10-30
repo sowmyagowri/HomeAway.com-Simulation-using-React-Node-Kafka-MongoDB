@@ -10,5 +10,8 @@ export const userConstants = {
     PROPERTY_SEARCH: 'propertysearch',
     PROPERTY_DETAILS: 'propertydetails',
     PROPERTY_BOOK: 'propertybook',
-    LIST_BOOKINGS: 'listbookings'
+    LIST_BOOKINGS: 'listbookings',
+    SEND_MAIL: 'sendmail',
+    GET_EMAILS: 'getemails',
+    GET_SENTEMAILS: 'getsentemails',
 };

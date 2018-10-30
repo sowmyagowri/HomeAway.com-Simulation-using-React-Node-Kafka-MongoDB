@@ -305,12 +305,12 @@ class PropertySearchResults extends Component {
                     <div>
                         <img style={{marginTop: "13px"}} alt="US Flag" src={require('./us_flag.png')}/>
                     </div>
-                    <button id="blue" className="btn" style = {{fontColor : "black", backgroundColor:"white", background:"white", borderColor:"white"}} type="button"><a href="#">Trip Boards</a></button>
+                    <button id="blue" className="btn" style = {{fontColor : "black", backgroundColor:"white", background:"white", borderColor:"white"}} type="button"><a >Trip Boards</a></button>
                     {!this.state.isTravelerLoggedIn 
                     ?
                     (
                     <div className="btn btn-group" id="white">
-                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a href="#">Login</a></button>
+                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a >Login</a></button>
                         <div className="dropdown-menu">
                             <a className="dropdown-item" href="/traveller/login">Traveller Login</a>
                             <a className="dropdown-item" href="/owner/login">Owner Login</a>
@@ -326,10 +326,10 @@ class PropertySearchResults extends Component {
                             <a className="dropdown-item" href="/Profile"> <i className="fas fa-envelope"></i> Inbox</a>
                             <a className="dropdown-item" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a>
                             <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
-                            <a className="dropdown-item" href="#" onClick= {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
+                            <a className="dropdown-item"  onClick= {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
                             </div>
                         </div>
-                        <img style = {{marginRight: "20px", }} alt="US Flag" src={require('./mailbox.png')}/>
+                        <a href="/inbox" title = "HomeAway" className = "logo"><img style = {{marginRight: "20px", }} alt="Mailbox" src={require('./mailbox.png')}/></a>
                     </div>
                     )
                     }
@@ -389,11 +389,11 @@ class PropertySearchResults extends Component {
                                     {textValue1 === 0 && textValue2 === 1000
                                     ?
                                     (
-                                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a href="#">Any Price</a></button>
+                                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a >Any Price</a></button>
                                     )
                                     :
                                     (
-                                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a href="#">${textValue1 + ' - ' + '$' + textValue2}</a></button>
+                                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a >${textValue1 + ' - ' + '$' + textValue2}</a></button>
                                     )
                                     }
                                     <div className="dropdown-menu"  style={{width: "450px", height: "200px"}}>
@@ -437,11 +437,11 @@ class PropertySearchResults extends Component {
                                     {bedroomsHigh === 0
                                     ?
                                     (
-                                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a href="#">Any bedrooms</a></button>
+                                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a >Any bedrooms</a></button>
                                     )
                                     :
                                     (
-                                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a href="#">{bedroomsLow + ' - ' + bedroomsHigh} bedrooms</a></button>
+                                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a >{bedroomsLow + ' - ' + bedroomsHigh} bedrooms</a></button>
                                     )
                                     }
                                     <div className="dropdown-menu"  style={{width: "300px", height: "300px"}}>
