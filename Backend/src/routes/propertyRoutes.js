@@ -2,9 +2,7 @@ var express = require('express');
 var router = express.Router();
 var kafka = require('../routes/kafka/client');
 
-var Properties = require('../models/PropertySchema');
 var Bookings = require('../models/BookingSchema');
-var async = require('async');
 
 // Set up middleware
 var passport = require('passport');
@@ -84,6 +82,7 @@ router.route('/property/search').post(function (req, res) {
       console.log("unable to search database");
       res.status(400).json({responseMessage: 'unable to search database'});
     } else if (result.status === 200) {
+      console.log("result length:", result.result.length)
       res.writeHead(200, {'content-type':'application/json'});
       res.end(JSON.stringify(result.result));
     }    
@@ -183,7 +182,7 @@ router.route('/traveller/triplistings').post(requireAuth, function (req, res) {
       res.status(400).json({responseMessage: 'Trips not found'});
     } else {
       console.log("Trips Found");
-      console.log(result.result);
+      //console.log(result.result);
       res.writeHead(200, {'content-type':'application/json'});
       res.end(JSON.stringify(result.result));
     }

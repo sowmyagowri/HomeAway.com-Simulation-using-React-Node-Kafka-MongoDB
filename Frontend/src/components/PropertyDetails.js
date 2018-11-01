@@ -48,15 +48,19 @@ class PropertyDetails extends Component {
         this.toDateChangeHandler = this.toDateChangeHandler.bind(this);
         this.noOfGuestsChangeHandler = this.noOfGuestsChangeHandler.bind(this);
         this.submitBooking = this.submitBooking.bind(this);
-        this.openModal = this.openModal.bind(this);
-        this.closeModal = this.closeModal.bind(this);
-        this.handlemessage = this.handlemessage.bind(this);
+        this.openPopup = this.openPopup.bind(this);
+        this.closePopup = this.closePopup.bind(this);
+        this.messageChangeHandler = this.messageChangeHandler.bind(this);
 
     }
     
     componentWillMount () {
         console.log("In Property Details");
         var propertyID = this.state.propertyid;
+
+        if(cookie.load('cookie1') === 'travellercookie'){
+            this.setState({ isTravelerLoggedIn: true });
+        }
 
         this.props.propertydetails(propertyID, sessionStorage.getItem('jwtToken'))
         .then(response => {
@@ -65,7 +69,7 @@ class PropertyDetails extends Component {
                 console.log(response.payload.data)
                 this.setState({propertyDetails : response.payload.data})
             }
-            console.log(this.state.propertyDetails.headline);
+            
         });
     }
     
@@ -197,7 +201,7 @@ class PropertyDetails extends Component {
         });
     }
 
-    openModal = () => {
+    openPopup = () => {
         if (this.state.isTravelerLoggedIn){
             if (this.state.adate && this.state.ddate && this.state.pguests) {
                 this.setState({ open: true });
@@ -210,11 +214,11 @@ class PropertyDetails extends Component {
         }
     };
 
-    closeModal = () => {
+    closePopup = () => {
         this.setState({ open: false });
     };
 
-    handlemessage = (event) => {
+    messageChangeHandler = (event) => {
         this.setState ({
             mailcontent : event.target.value
         })
@@ -262,9 +266,6 @@ class PropertyDetails extends Component {
 
     render(){
 
-        if(cookie.load('cookie1') === 'travellercookie'){
-            this.setState({ isTravelerLoggedIn: true });
-        } 
         const {propertyDetails} = this.state;
 
         var start = moment(this.state.bookingFromDate, "YYYY-MM-DD");
@@ -468,18 +469,18 @@ class PropertyDetails extends Component {
                                 <div className = "row">
                                     <div className="col-md-offset-3">
                                         <div className="form-group " style = {{marginLeft : "50px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
-                                            <h5>No of Guests</h5>
+                                            <h5>No. of Guests</h5>
                                         </div>
                                     </div>
                                 </div>
                                 <div className = "row">
-                                    <div className="col-md-8" style={{marginLeft : "50px"}}>
+                                    <div className="col-md-8" style={{marginLeft : "50px", maxHeight: "52px", maxWidth: "172px"}}>
                                         <div className="form-group card" style = {{width: "180px",  marginLeft : "-9px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
                                             <div className="input-group" style={{height: "50px"}}>
                                                 <span className="input-group-prepend">
                                                     <div className="input-group-text form-control" ><i className="fa fa-user-friends"></i></div>
                                                 </span>
-                                                <input type="text" style ={{height: "49px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control"
+                                                <input type="mumber" style ={{height: "49px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control"
                                                 value={this.state.guests} onChange = {this.noOfGuestsChangeHandler} min="1"/>
                                             </div> 
                                         </div>
@@ -503,53 +504,52 @@ class PropertyDetails extends Component {
                                     {this.state.alert}
                                 </div>
                                 <hr/>
-                                <button id="blue" className="btn" onClick={this.openModal} style = {{marginLeft : "50px", fontColor : "black", backgroundColor:"white", background:"transparent", borderColor:"transparent"}} type="button"><a >Ask Manager a Question</a></button>
-                                    <Popup open={this.state.open} closeOnDocumentClick onClose={this.closeModal}>
-                                            <div>
-                                                <div className="modal1">
-                                                    <a className="close" onClick={this.closeModal}>&times;</a>
-                                                        <div className="header" style = {{marginTop : "30px"}}><h2>Ask Owner a Question</h2></div>
-                                                            <hr/>
-                                                            <div className="content">
-                                                                <div className="row">
-                                                                    <div id="floatContainer1" className="col-md-3 float-container">
-                                                                        <label htmlFor="floatField4">Arrive</label>
-                                                                        <input id="adate" value = {this.state.bookingFromDate} name="adate" readOnly type="text"/>
-                                                                    </div>
-                                                                    <div id="floatContainer1" className = "col-md-3 float-container" style = {{marginLeft: "10px"}}>
-                                                                        <label htmlFor="floatField5">Depart</label>
-                                                                        <input id="ddate" value = {this.state.bookingToDate} name="ddate" readOnly type="text"/>
-                                                                    </div>
-                                                                    <div id="floatContainer1" className="col-md-3 float-container" style = {{marginLeft: "10px", width: "50px"}}>
-                                                                        <label htmlFor="floatField6">Guests</label>
-                                                                        <input id="guests" value = {this.state.guests} name="guests" readOnly type="text"/>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="row">
-                                                                    <div id="floatContainer1" className="float-container">
-                                                                        <label htmlFor="floatField1">First Name</label>
-                                                                        <input id="firstname" value = {cookie.load('cookie3')} name="firstname"readOnly type="text"/>
-                                                                    </div>
-                                                                    <div id="floatContainer1" className="float-container">
-                                                                        <label htmlFor="floatField2">Last Name</label>
-                                                                        <input id="firstname" value = {cookie.load('cookie4')} name="lastname"  readOnly type="text"/>
-                                                                    </div>
-                                                                    <div id="floatContainer1" className="float-container">
-                                                                        <label htmlFor="floatField3">Email Address</label>
-                                                                        <input id="emailaddress" value = {cookie.load('cookie2')} name="email" readOnly type="text"/>
-                                                                    </div>
-                                                                    <div className="float-container1">
-                                                                        <textarea id="message"  onChange = {this.handlemessage} cols="40" rows="5" placeholder="Message to Owner" className="form-control"></textarea>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <button className="btn btn-primary" onClick = {this.sendMessage} style = {{ height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "120px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
-                                                            Send
-                                                        </button>
+                                <button id="blue" className="btn" onClick={this.openPopup} style = {{marginLeft : "50px", fontColor : "black", backgroundColor:"white", background:"transparent", borderColor:"transparent"}} type="button">
+                                    <a >Ask Manager a Question</a>
+                                </button>
+                                <Popup open={this.state.open} closeOnDocumentClick onClose={this.closePopup}>
+                                    <div>
+                                        <div className="popup1">
+                                            <a className="close" onClick={this.closePopup}>&times;</a>
+                                            <div className="header" style = {{marginTop : "30px", color: "blue"}}><h2>Ask Owner a Question</h2></div>
+                                                <hr/>
+                                                <div className="content">
+                                                    <div className="row">
+                                                        <div id="floatContainer1" className="col-md-3 float-container">
+                                                            <label htmlFor="floatField4">Arrive</label>
+                                                            <input id="shadownone" value = {this.state.bookingFromDate} name="adate" readOnly type="text"/>
                                                         </div>
-                                                       
+                                                        <div id="floatContainer1" className = "col-md-3 float-container" style = {{marginLeft: "10px"}}>
+                                                            <label htmlFor="floatField5">Depart</label>
+                                                            <input id="shadownone" value = {this.state.bookingToDate} name="ddate" readOnly type="text"/>
+                                                        </div>
+                                                        <div id="floatContainer1" className="col-md-3 float-container" style = {{marginLeft: "10px", maxWidth: "180px"}}>
+                                                            <label htmlFor="floatField6">No. of Guests</label>
+                                                            <input id="shadownone" value = {this.state.guests} name="guests" readOnly type="text"/>
+                                                        </div>
+                                                    </div>
+                                                    <div className="row">
+                                                        <div id="floatContainer1" className="float-container">
+                                                            <label htmlFor="floatField1">First Name</label>
+                                                            <input id="shadownone" value = {cookie.load('cookie3')} name="firstname"readOnly type="text"/>
+                                                        </div>
+                                                        <div id="floatContainer1" className="float-container">
+                                                            <label htmlFor="floatField2">Last Name</label>
+                                                            <input id="shadownone" value = {cookie.load('cookie4')} name="lastname"  readOnly type="text"/>
+                                                        </div>
+                                                        <div id="floatContainer1" className="float-container">
+                                                            <label htmlFor="floatField3">Email Address</label>
+                                                            <input id="shadownone" value = {cookie.load('cookie2')} name="email" readOnly type="text"/>
+                                                        </div>
+                                                        <textarea id="message"  style={{width: "600px", marginLeft : "80px", }} onChange = {this.messageChangeHandler} cols="40" rows="5" placeholder="Message to Owner" className="form-control"></textarea>
+                                                    </div>
                                                 </div>
-                                        </Popup>
+                                                <button className="btn btn-primary" onClick = {this.sendMessage} style = {{ height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "120px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
+                                                    Send
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </Popup>
                                 </div>
                             </div>
                         </div>

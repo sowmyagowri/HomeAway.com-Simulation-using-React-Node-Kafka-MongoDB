@@ -30,7 +30,7 @@ router.route('/traveller/login').post(function (req, res) {
       res.cookie('cookie1',"travellercookie",{maxAge: 900000, httpOnly: false, path : '/'});
       res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
       res.cookie('cookie3',result.user.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-      res.cookie('cookie4',result.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
+      res.cookie('cookie4',result.user.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
       req.session.user = result.user.email;
       //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
       res.status(200).json({responseMessage: 'Login Successful', token: 'JWT ' + token});

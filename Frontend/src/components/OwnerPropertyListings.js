@@ -33,6 +33,7 @@ class OwnerPropertyListings extends Component {
         this.renderListings = this.renderListings.bind(this);
         this.logout = this.logout.bind(this);
         this.changeHandler = this.changeHandler.bind(this);
+        this.handleValidation = this.handleValidation.bind(this);
         this.searchProperty = this.searchProperty.bind(this);
     }
 
@@ -51,64 +52,104 @@ class OwnerPropertyListings extends Component {
         this.setState({ [name]: value });
     }
 
+    handleValidation(){
+
+        console.log("in handle")
+        let formIsValid = true;
+        
+        if(!this.state.fromdate && !this.state.todate){
+            return formIsValid;
+        }
+
+        //From Date
+        if(!this.state.fromdate){
+          formIsValid = false;
+          alert("From Date is a Required field");
+          console.log("From Date cannot be empty");
+        } else {
+          var CurrentDate = new Date();
+          CurrentDate.setHours(0,0,0,0);
+          var GivenfromDate = new Date(this.state.fromdate.replace(/-/g, '\/'));
+        }
+    
+        //To Date
+        if(!this.state.todate){
+            formIsValid = false;
+            alert("To Date is a Required field");
+            console.log("To Date cannot be empty");
+        } else {
+            var CurrentDate = new Date();
+            CurrentDate.setHours(0,0,0,0);
+            var GiventoDate = new Date(this.state.todate.replace(/-/g, '\/'));
+
+            if (GiventoDate <= GivenfromDate){
+                alert('To date should be greater than from date.');
+                formIsValid = false;
+            }
+        }
+        return formIsValid;
+    }
+
     searchProperty = () => {
 
         console.log("in search property");
-        const requestData = { 
-            listedBy : cookie.load('cookie2'),
-            currentPage: 1, 
-            pageLimit: 0,
-            fromdate: this.state.fromdate,
-            todate: this.state.todate,
-        }
-
         this.setState({
             detailsFetched: false,
         });
 
-        this.props.propertylisting(requestData, sessionStorage.getItem('jwtToken'))
-        .then(response => {
-            if(response.payload.status === 200){
-                if (response.payload.data.length > 0){
-                    if(this.state.searchString === "" || this.state.searchString === null){
+        if(this.handleValidation()){
+            const requestData = { 
+                listedBy : cookie.load('cookie2'),
+                currentPage: 1, 
+                pageLimit: 0,
+                fromdate: this.state.fromdate,
+                todate: this.state.todate,
+            }
+
+            this.props.propertylisting(requestData, sessionStorage.getItem('jwtToken'))
+            .then(response => {
+                if(response.payload.status === 200){
+                    if (response.payload.data.length > 0){
+                        if(this.state.searchString === "" || this.state.searchString === null){
+                            const allListings = response.payload.data;
+                            this.setState({
+                                allListings,
+                                detailsFetched: true,
+                                refreshListings: true,
+                            });
+                        } else {
+                            var text = this.state.searchString.toLowerCase();
+                            const allListings = response.payload.data;
+                            let searchedListings1 = allListings.filter((row) => {
+                                return row.headline.toLowerCase().includes(text);
+                            });
+                            if (searchedListings1.length > 0) {
+                                this.setState ({
+                                    allListings : searchedListings1,
+                                    detailsFetched: true,
+                                    refreshListings: true,
+                                })
+                            } else {
+                                this.setState ({
+                                    detailsFetched: false,
+                                    refreshListings: false,
+                                })
+                            }
+                        }
+                    } else {
                         const allListings = response.payload.data;
                         this.setState({
                             allListings,
-                            detailsFetched: true,
-                            refreshListings: true,
+                            detailsFetched: false,
+                            refreshTrips: false,
                         });
-                    } else {
-                        var text = this.state.searchString.toLowerCase();
-                        const allListings = response.payload.data;
-                        let searchedListings1 = allListings.filter((row) => {
-                            return row.headline.toLowerCase().includes(text);
-                        });
-                        if (searchedListings1.length > 0) {
-                            this.setState ({
-                                allListings : searchedListings1,
-                                detailsFetched: true,
-                                refreshListings: true,
-                            })
-                        } else {
-                            this.setState ({
-                                detailsFetched: false,
-                                refreshListings: false,
-                            })
-                        }
                     }
-                } else {
-                    const allListings = response.payload.data;
-                    this.setState({
-                        allListings,
-                        detailsFetched: false,
-                        refreshTrips: false,
-                    });
                 }
-            }
-        })
-        .catch (error => {
-            console.log(error);
-        });
+            })
+            .catch (error => {
+                console.log(error);
+            });
+        }
     } 
 
     onPageChanged = data => {

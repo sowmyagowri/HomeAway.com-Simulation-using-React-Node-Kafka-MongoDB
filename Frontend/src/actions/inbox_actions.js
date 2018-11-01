@@ -22,7 +22,7 @@ export function sendmail(formdata, tokenFromStorage) {
 
 //target action to get emails for inbox
 export function getemails(formdata, tokenFromStorage) {
-  console.log("Inside Send Mail to Owner Post action")
+  console.log("Inside get Mail Post action")
   console.log(formdata)
   console.log("tokenFromStorage", tokenFromStorage)
   var config = {
@@ -41,7 +41,7 @@ export function getemails(formdata, tokenFromStorage) {
 
 //target action to get sent emails
 export function getsentemails(formdata, tokenFromStorage) {
-  console.log("Inside Send Mail to Owner Post action")
+  console.log("Inside Get sent email Post action")
   console.log(formdata)
   console.log("tokenFromStorage", tokenFromStorage)
   var config = {

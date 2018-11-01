@@ -8,7 +8,7 @@ function make_request(queue_name, msg_payload, callback){
 		if(err)
 			console.error(err);
 		else{
-			console.log("response from rpc.make_request in client.js: ", response);
+			//console.log("response from rpc.make_request in client.js: ", response);
 			callback(null, response);
 		}
 	});

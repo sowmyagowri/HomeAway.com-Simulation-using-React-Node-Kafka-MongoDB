@@ -38,15 +38,15 @@ class Inbox extends Component {
         this.handlemessage = this.handlemessage.bind(this);
     }
 
-    openEmail(Eid) {
+    openEmail(_id) {
         this.setState({
-            currentEmailId: Eid,
+            currentEmailId: _id,
         });
     };
     
-    openSentEmail(Eid) {
+    openSentEmail(_id) {
         this.setState({
-            currentSentEmailId: Eid,
+            currentSentEmailId: _id,
         });
     };
     
@@ -117,7 +117,7 @@ class Inbox extends Component {
                     sentemails : response.payload.data,
                     isLoading : false,
                     issentboxempty : false,
-                    currentSentEmailId :response.payload.data[0].Eid
+                    currentSentEmailId :response.payload.data[0]._id
                 })
                 console.log(this.state.sentemails)
             }
@@ -265,7 +265,7 @@ class Inbox extends Component {
                                                         sendername : cookie.load('cookie3') + ' ' + cookie.load('cookie4'),
                                                         senderemail : cookie.load('cookie2'),
                                                         receiver : email.Sender,
-                                                        Eid : email.Eid,
+                                                        _id : email._id,
                                                         propertyid : email.PropertyID,
                                                         propertylocated : email.City,
                                                         propertyheader : email.PropertyHeader,
@@ -401,7 +401,7 @@ const EmailListItem = ({ email, openEmail, selected  }) => {
     }
         
     return (
-        <div className={classes} onClick={() => openEmail(email.Eid)}>
+        <div className={classes} onClick={() => openEmail(email._id)}>
             <div className="email-item__name">{!email.Replied ? <div className ="dot"></div> : (null)}&nbsp;&nbsp;{email.Sender}</div>
             <div className="email-item__subject" >
             <strong>{email.Header}</strong>
@@ -476,93 +476,91 @@ const EmailDetails = ({ email, open , mailreply, openModal, closeModal, handleme
         <div className="email-details__wrapper col-md-8">
             <div className="email-details__container">
                 <div className="email-details__header">
-                <div className="email-details__info">
-                    <h5>{email.Sender} {"<"}{email.SenderEmailAddress}{">"}</h5>
-                    <span className="pull-right">{prettyDate(email.TimeReceived)}</span>
-                </div>
-                <div className="email-details__info">
-                    <strong>PropertyID #{email.PropertyID}&nbsp;{email.PropertyHeader}</strong></div>
-                <div className="email-details__info">
-                    <strong>{email.City}</strong></div>
-                <div className="email-details__info">
-                    <strong>Check In&nbsp;&nbsp;: {email.Arrivaldate}</strong></div>
-                <div className="email-details__info">
-                    <strong>Check Out : {email.Departdate}</strong></div>
-                <div className="email-details__info">
-                    <strong>Guests : {email.Guests}</strong>
-                </div>
-                <div className="email-details__buttons">
+                    <a onClick={openModal} style={{float: "right"}}><i class="fa fa-reply fa-3x"></i></a>
                     <div className="email-details__mark">
-                    <button className="btn" onClick={openModal}><span ><i className="fa fa-envelope-o markUnread"></i></span></button>
-                    <Popup open ={open} closeOnDocumentClick onClose={closeModal}>
-                                        <div>
-                                                <div className="modal1">
-                                                <a className="close" onClick={closeModal}>
-                                                    &times;
-                                                    </a>
-                                                        <div className="header" style = {{marginTop : "30px"}}><h2>Compose Message</h2></div>
-                                                        <hr/>
-                                                            <div className="content">
-                                                            <div className="row">
-                                                            <div id="floatContainer3" className="float-container">
-                                                                <label htmlFor="floatField3">Email Address</label>
-                                                                <input type = 'text' value ={email.SenderEmailAddress} readOnly/>
-                                                                </div>
-                                                            </div>
-                                                            <div className="row">
-                                                            <div className="col-md-3"  style = {{marginLeft: "8%"}}>
-                                                                <div className="form-group card" style = {{ backgroundColor: "#f6f7f8", height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
-                                                                <small style = {{marginLeft : "5px", fontSize : "15px" , marginRight : "5px"}}>Arrive</small>
-                                                                <input type = 'text' value ={email.Arrivaldate} style = {{backgroundColor: "#f6f7f8", border : "none", marginTop : "16px"}}  readOnly/>
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-md-3" style = {{marginLeft: "13px"}}>
-                                                                <div className="form-group card" style = {{backgroundColor: "#f6f7f8", height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
-                                                                <small style = {{marginLeft : "5px", fontSize : "15px" , marginRight : "5px"}}>Depart</small>
-                                                                <input type = 'text' value ={email.Departdate}  style = {{ marginLeft : "25px", backgroundColor: "#f6f7f8", border : "none", marginTop : "16px"}}  readOnly/>
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-md-3" style = {{marginLeft: "13px"}}>
-                                                                <div className="form-group card" style = {{backgroundColor: "#f6f7f8", width : "180px", height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
-                                                                <small style = {{marginLeft : "5px", fontSize : "15px" , marginRight : "5px"}}>Guests</small>
-                                                                <input type = 'text'  value ={email.Guests}  style = {{ marginLeft : "25px", backgroundColor: "#f6f7f8", border : "none", marginTop : "16px"}}  readOnly/>
-                                                                </div>
-                                                            </div>
-                                                            </div>
-                                                            <div className="row">
-                                                                <div id="floatContainer5" className="float-container">
-                                                                    <label htmlFor="floatField5">Customer Name</label>
-                                                                    <input type = 'text' value ={email.Sender} readOnly/>
-
-                                                                </div>
-                                                                <div className="float-container1">
-                                                                    <textarea id="message" readOnly value = {email.MailContent} name="aboutme" cols="40" rows="4" placeholder="Message from Customer" className="form-control"></textarea>
-                                                                </div>
-
-                                                                <div className="float-container1">
-                                                                    <textarea id="message" value = {mailreply} onChange = {handlemessage} cols="40" rows="10" placeholder="Message to Customer" className="form-control"></textarea>
-                                                                </div>
-                                                                </div>
-
-                                                                </div>
-                                                        </div>
-                                                        <div className="actions">
-                                            <button
-                                                className="btn btn-primary btn2"
-                                                style = {{ height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", borderRadius: 30}} 
-                                                data-effect="ripple" 
-                                                type="button" 
-                                                tabIndex="5" 
-                                                data-loading-animation="true"
-                                                onClick={() => handlesend(email, mailreply)}>
-                                                Send
-                                            </button>
+                        <Popup open ={open} closeOnDocumentClick onClose={closeModal}>
+                            <div>
+                                <div className="modal1">
+                                    <a className="close" onClick={closeModal}>&times;</a>
+                                    <div className="header" style = {{marginTop : "30px"}}>
+                                        <h2>Compose Message</h2>
+                                    </div>
+                                    <hr/>
+                                    <div className="content">
+                                        <div className="row">
+                                            <div id="floatContainer3" className="float-container">
+                                                <label htmlFor="floatField3">Email Address</label>
+                                                <input type = 'text' value ={email.SenderEmailAddress} readOnly/>
                                             </div>
+                                        </div>
+                                        <div className="row">
+                                            <div className="col-md-3"  style = {{marginLeft: "8%"}}>
+                                                <div className="form-group card" style = {{ backgroundColor: "#f6f7f8", height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
+                                                    <small style = {{marginLeft : "5px", fontSize : "15px" , marginRight : "5px"}}>Arrive</small>
+                                                    <input type = 'text' value ={email.Arrivaldate} style = {{backgroundColor: "#f6f7f8", border : "none", marginTop : "16px"}}  readOnly/>
+                                                </div>
                                             </div>
-                                        
-                                    </Popup>
+                                            <div className="col-md-3" style = {{marginLeft: "13px"}}>
+                                                <div className="form-group card" style = {{backgroundColor: "#f6f7f8", height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
+                                                    <small style = {{marginLeft : "5px", fontSize : "15px" , marginRight : "5px"}}>Depart</small>
+                                                    <input type = 'text' value ={email.Departdate}  style = {{ marginLeft : "25px", backgroundColor: "#f6f7f8", border : "none", marginTop : "16px"}}  readOnly/>
+                                                </div>
+                                            </div>
+                                            <div className="col-md-3" style = {{marginLeft: "13px"}}>
+                                                <div className="form-group card" style = {{backgroundColor: "#f6f7f8", width : "180px", height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
+                                                    <small style = {{marginLeft : "5px", fontSize : "15px" , marginRight : "5px"}}>Guests</small>
+                                                    <input type = 'text'  value ={email.Guests}  style = {{ marginLeft : "25px", backgroundColor: "#f6f7f8", border : "none", marginTop : "16px"}}  readOnly/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="row">
+                                            <div id="floatContainer5" className="float-container">
+                                                <label htmlFor="floatField5">Customer Name</label>
+                                                <input type = 'text' value ={email.Sender} readOnly/>
+                                            </div>
+                                            <div className="float-container1">
+                                                <textarea id="message" readOnly value = {email.MailContent} name="aboutme" cols="40" rows="4" placeholder="Message from Customer" className="form-control"></textarea>
+                                            </div>
+                                            <div className="float-container1">
+                                                <textarea id="message" value = {mailreply} onChange = {handlemessage} cols="40" rows="10" placeholder="Message to Customer" className="form-control"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="actions">
+                                    <button
+                                        className="btn btn-primary btn2"
+                                        style = {{ height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", borderRadius: 30}} 
+                                        data-effect="ripple" 
+                                        type="button" 
+                                        tabIndex="5" 
+                                        data-loading-animation="true"
+                                        onClick={() => handlesend(email, mailreply)}>
+                                        Send
+                                    </button>
+                                </div>
+                            </div>
+                        </Popup>
                     </div>
-                </div>
+                    <div className="email-details__info">
+                        <h5>{email.Sender} {"<"}{email.SenderEmailAddress}{">"}</h5>
+                        <span className="pull-right">{prettyDate(email.TimeReceived)}</span>
+                    </div>
+                    <div className="email-details__info">
+                        <strong>PropertyID #{email.PropertyID}&nbsp;{email.PropertyHeader}</strong>
+                    </div>
+                    <div className="email-details__info">
+                        <strong>{email.City}</strong>
+                    </div>
+                    <div className="email-details__info">
+                        <strong>Check In&nbsp;&nbsp;: {email.Arrivaldate}</strong>
+                    </div>
+                    <div className="email-details__info">
+                        <strong>Check Out : {email.Departdate}</strong>
+                    </div>
+                    <div className="email-details__info">
+                        <strong>Guests : {email.Guests}</strong>
+                    </div>
                 </div>
                 <div className="email-details__message" style = {{whiteSpace : "pre-wrap"}}>
                     <h6 style = {{color :"#5e6d77", fontSize : "18px"}}>{email.MailContent}</h6>
@@ -571,7 +569,6 @@ const EmailDetails = ({ email, open , mailreply, openModal, closeModal, handleme
         </div>
     )
 }
-
 
 function mapStateToProps(state) {
     return { 

@@ -13,6 +13,8 @@ import { connect } from 'react-redux';
 import Nouislider from "nouislider-react";
 import "nouislider/distribute/nouislider.css";
 
+import Pagination from "./Pagination";
+
 var longitude, lattitude, locationTitle;
 
 class PropertySearchResults extends Component {
@@ -25,12 +27,18 @@ class PropertySearchResults extends Component {
             email: "",
             submitted: false,
             message: "",
-            price: 0,
-            bedrooms: 1,
+            location : "",
+            fromdate : "",
+            todate : "",
+            noOfGuests: "",
             isTravelerLoggedIn: false,
             detailsFetched:false,
             isLoading : true,
-            searchData:[{}],
+            allSearchData:[{}],
+            currentSearchData:[{}],
+            currentPage: null,
+            totalPages: null,
+            refreshTrips : false,
             textValue1: 0,
             textValue2: 1000,
             bedroomsLow: 0,
@@ -40,6 +48,8 @@ class PropertySearchResults extends Component {
         this.handleValidation = this.handleValidation.bind(this);
         this.searchPlace = this.searchPlace.bind(this);
         this.renderSearchResult = this.renderSearchResult.bind(this);
+        this.priceclear = this.priceclear.bind(this);
+        this.bedroomsclear = this.bedroomsclear.bind(this);
         this.onSlide = this.onSlide.bind(this);
         this.logout = this.logout.bind(this);
     }
@@ -52,6 +62,23 @@ class PropertySearchResults extends Component {
 
     };
 
+    priceclear = () => {
+        this.setState({
+            textValue1: 0,
+            textValue2: 1000
+            
+        });
+
+    };
+
+    bedroomsclear = () => {
+        this.setState({
+            bedroomsLow: 0,
+            bedroomsHigh: 0
+        });
+
+    };
+
     logout = () => {
         cookie.remove('cookie1', {path: '/'})
         cookie.remove('cookie2', {path: '/'})
@@ -60,13 +87,47 @@ class PropertySearchResults extends Component {
         window.location = "/"
     }
     
-  componentWillMount(){
-    this.setState ({ 
-        location : this.props.location.state?this.props.location.state.location:"",
-        fromdate : this.props.location.state?this.props.location.state.fromDate:"",
-        todate : this.props.location.state?this.props.location.state.toDate:"",
-        noOfGuests: this.props.location.state?this.props.location.state.noOfGuests:""
-    })
+    onPageChanged = data => {
+
+        console.log("page changed");
+        const { currentPage, totalPages, pageLimit } = data;
+
+        const requestDataPageChange = { 
+            city : this.props.location.state?this.props.location.state.location:"",
+            startDate : this.props.location.state?this.props.location.state.fromDate:"",
+            endDate : this.props.location.state?this.props.location.state.toDate:"",
+            noOfGuests: this.props.location.state?this.props.location.state.noOfGuests:"",
+            priceLow: this.state.textValue1,
+            priceHigh: this.state.textValue2,
+            bedroomsLow: this.state.bedroomsLow,
+            bedroomsHigh: this.state.bedroomsHigh,
+            currentPage: currentPage, 
+            pageLimit: pageLimit,
+        }
+
+        this.props.propertysearch(requestDataPageChange, sessionStorage.getItem('jwtToken'))
+            .then(response => {
+                console.log("Status Code : ", response.payload.status);
+                if(response.payload.status === 200){
+                    if (response.payload.data.length > 0){
+                        this.setState({
+                            currentSearchData : response.payload.data,
+                            isLoading : false,
+                            refreshTrips: false,
+                        });
+                        this.setState({ currentPage, totalPages });
+                    }
+                }
+            });
+    }
+
+    componentWillMount(){
+        this.setState ({ 
+            location : this.props.location.state?this.props.location.state.location:"",
+            fromdate : this.props.location.state?this.props.location.state.fromDate:"",
+            todate : this.props.location.state?this.props.location.state.toDate:"",
+            noOfGuests: this.props.location.state?this.props.location.state.noOfGuests:""
+        })
 
         const data = { 
             city : this.props.location.state?this.props.location.state.location:"",
@@ -77,6 +138,8 @@ class PropertySearchResults extends Component {
             priceHigh: this.state.textValue2,
             bedroomsLow: this.state.bedroomsLow,
             bedroomsHigh: this.state.bedroomsHigh,
+            currentPage: 1, 
+            pageLimit: 0,
         }
         console.log("Calling Property Search in Will mount");
         console.log(data);
@@ -84,55 +147,46 @@ class PropertySearchResults extends Component {
         .then(response => {
             console.log("Status Code : ",response.payload.status);
             if(response.payload.status === 200){
-                console.log(response.payload.data)
-                this.setState({
-                    searchData : response.payload.data,
-                    isLoading : false,
-                });
+                if (response.payload.data.length > 0){
+                    console.log(response.payload.data)
+                    this.setState({
+                        allSearchData : response.payload.data,
+                        detailsFetched: true,
+                    });
+                }
             }
         })
     }
 
     renderSearchResult () {
-        const {searchData} = this.state;
+        const {currentSearchData} = this.state;
         const {isLoading} = this.state;
-        // var currency;
-        // if (searchData[i].currency === 'USD' || 'AUD' || 'CAD' || 'NZD'){
-        //     currency = '$'
-        // } else if (searchData[i].currency === 'EUR'){
-        //     currency = '€'
-        // }
-        // else if (searchData[i].currency === 'GBP'){
-        //     currency = '£'
-        // }
-        // else if (searchData[i].currency === 'BRL'){
-        //     currency = 'R$'
-        // }
 
         if(!isLoading){
-            return Object.keys(searchData).map((i) => {
-                    return <div className="brdr bgc-white box-shad1 btm-mrg-20 property-listing" key={searchData[i].ID}>
+            return Object.keys(currentSearchData).map((i) => {
+                    return <div className="brdr bgc-white box-shad1 btm-mrg-20 property-listing" key={currentSearchData[i].ID}>
                     <div className="media">
-                        <img alt="Thumbnail View of Property" style={{height: "230px", width: "240px"}}src={`http://localhost:3001/uploads/${searchData[i].image1}`} />
+                        <img alt="Thumbnail View of Property" style={{height: "230px", width: "240px"}}src={`http://localhost:3001/uploads/${currentSearchData[i].image1}`} />
                         <div className="clearfix visible-sm"> </div>
                             <div className="media-body fnt-smaller">
-                                <input id = "heading" value = {searchData[i].headline} type="text" readOnly="readOnly" />
+                                <input id = "heading" style={{paddingLeft: "10px"}} value = {currentSearchData[i].headline} type="text" readOnly="readOnly" />
                                 <br></br><br></br>
-                                <ul className="list-inline">
-                                    <li className = "list-inline-item">{searchData[i].propertyType}</li>
-                                    <li className = "list-inline-item dot"></li>
-                                    <li className = "list-inline-item"> {searchData[i].bedrooms} BR</li>
-                                    <li className = "list-inline-item dot"></li>
-                                    <li className = "list-inline-item"> {searchData[i].bathrooms} BA</li>
-                                    <li className = "list-inline-item dot"></li>
-                                    <li className = "list-inline-item"> Sleeps  {searchData[i].sleeps}</li>
+                                <ul className="list-inline" style={{paddingLeft: "10px"}}>
+                                    <li className = "list-inline-item"><i className="fas fa-home"></i></li>
+                                    <li className = "list-inline-item">{currentSearchData[i].propertyType}</li>
+                                    <li className = "list-inline-item"><i className="fas fa-bed"></i></li>
+                                    <li className = "list-inline-item"> {currentSearchData[i].bedrooms} BR</li>
+                                    <li className = "list-inline-item"><i className="fas fa-bath"></i></li>
+                                    <li className = "list-inline-item"> {currentSearchData[i].bathrooms} BA</li>
+                                    <li className = "list-inline-item"><i className="fas fa-user"></i></li>
+                                    <li className = "list-inline-item"> Sleeps  {currentSearchData[i].sleeps}</li>
                                 </ul>
                                 <br></br><br></br><br></br>
                                 <div className="input-group">
                                     <span className="input-group-prepend">
                                         <div className="input-group-text" style={{border: "none"}}><i className="fa fa-bolt" style={{fontSize: "24px"}}></i></div>
                                     </span>
-                                    <input type="text" className="form-control" style ={{background: "#ededed"}} id = "heading1" defaultValue = {searchData[i].currency + ' ' + searchData[i].baseRate} type="text" readOnly />
+                                    <input type="text" className="form-control" style ={{background: "#ededed"}} id = "heading1" defaultValue = {currentSearchData[i].currency + ' ' + currentSearchData[i].baseRate} type="text" readOnly />
                                 </div>
                                 <div className="input-group">
                                     <h5 style ={{background: "#ededed", width: "511px"}}> <small>View details for total price</small> </h5>
@@ -148,7 +202,7 @@ class PropertySearchResults extends Component {
                                         
                                     </span>
                                 </div>
-                                <Link className="view" to={`/property/${searchData[i]._id}/${this.state.location}/${this.state.fromdate}/${this.state.todate}/${this.state.noOfGuests}`} target="_blank">Dummy Link</Link>
+                                <Link className="view" to={`/property/${currentSearchData[i]._id}/${this.state.location}/${this.state.fromdate}/${this.state.todate}/${this.state.noOfGuests}`} target="_blank">Dummy Link</Link>
                             </div>
                         </div>
                     </div>
@@ -224,7 +278,7 @@ class PropertySearchResults extends Component {
         event.preventDefault();
         this.setState({ submitted: true });
         if(this.handleValidation()){
-            const data = {
+            const requestData = {
                 city : this.state.location,
                 startDate : this.state.fromdate,
                 endDate : this.state.todate,
@@ -233,24 +287,54 @@ class PropertySearchResults extends Component {
                 priceHigh: this.state.textValue2,
                 bedroomsLow: this.state.bedroomsLow,
                 bedroomsHigh: this.state.bedroomsHigh,
+                currentPage: 1, 
+                pageLimit: 0,
             }
         
-            this.props.propertysearch(data, sessionStorage.getItem('jwtToken'))
+            this.setState({
+                detailsFetched: false,
+                submitted: true,
+            });
+            
+            this.props.propertysearch(requestData, sessionStorage.getItem('jwtToken'))
                 .then(response => {
                     console.log("Status Code : ", response.payload.status);
                     if(response.payload.status === 200){
-                        console.log(response.payload.data)
-                        this.setState({
-                            searchData : response.payload.data,
-                            isLoading : false,
-                        });
+                        if (response.payload.data.length > 0){
+                            this.setState({
+                                allSearchData : response.payload.data,
+                                isLoading : false,
+                                detailsFetched: true,
+                                refreshTrips: true,
+                            });
+                        } else {
+                            const allSearchData = response.payload.data;
+                            this.setState({
+                                allSearchData,
+                                detailsFetched: false,
+                                refreshTrips: false,
+                            });
+                        }
                     }
                 })
+                .catch (error => {
+                    console.log(error);
+                });
         }
     }
 
     render(){
-        const { textValue1, textValue2, bedroomsLow, bedroomsHigh } = this.state;
+
+        console.log('cookie1');
+        if(cookie.load('cookie1') === 'travellercookie'){
+            this.state.isTravelerLoggedIn = true
+        }
+
+        const { currentPage, totalPages, allSearchData, refreshTrips, detailsFetched, textValue1, textValue2, bedroomsLow, bedroomsHigh} = this.state;
+        const totalSearchData = allSearchData.length;
+
+        console.log("detailsFetched:", detailsFetched);
+        console.log("totalSearchData:", totalSearchData);
 
         if(this.state.location.toLowerCase() === "san diego"){
             lattitude = 32.736349;
@@ -258,7 +342,6 @@ class PropertySearchResults extends Component {
             locationTitle = this.state.location
         }
         if(this.state.location.toLowerCase() === "sunnyvale"){
-            console.log("I am in location");
             lattitude = 37.3688;
             longitude = -122.0363;
             locationTitle = this.state.location
@@ -278,18 +361,7 @@ class PropertySearchResults extends Component {
             longitude = -122.431297;
             locationTitle = this.state.location
         }
-        console.log('cookie1');
-        if(cookie.load('cookie1') === 'travellercookie'){
-            this.state.isTravelerLoggedIn = true
-        }
-
-        if (this.state.searchData.length === 0) {
-            this.state.detailsFetched = false 
-        }
-        else {
-            this.state.detailsFetched = true 
-        }
-        console.log(lattitude, longitude)
+        
         return(
           <div>
             <Helmet>
@@ -380,151 +452,176 @@ class PropertySearchResults extends Component {
                     </div>
                 </div>
             </Navbar>
-                <div>
-                    <div id="baselayer" className="form-control" style={{borderRightStyle: "none", zIndex: "0", borderLeftStyle: "none"}}>
-                        <div style={{backgroundColor: "white", border: "1px #ededed"}} >
-                        <div className="row">
-                            <div className="col-xs-4 col-xs-offset-3" >
-                                <div className="btn btn-group" id="white" >
-                                    {textValue1 === 0 && textValue2 === 1000
-                                    ?
-                                    (
-                                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a >Any Price</a></button>
-                                    )
-                                    :
-                                    (
-                                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a >${textValue1 + ' - ' + '$' + textValue2}</a></button>
-                                    )
-                                    }
-                                    <div className="dropdown-menu"  style={{width: "450px", height: "200px"}}>
-                                        <div>
-                                            <h5 style = {{marginLeft: "25px", fontFamily: "Verdana", color: "grey"}}><small> Price Per Night  </small></h5>
-                                            {textValue1 !== 0 && textValue2 == 1000
-                                            ?
-                                            (
-                                                <h5 style = {{marginLeft: "25px", fontFamily: "Verdana"}}><small> ${textValue1 + '+'} </small></h5>
-                                            )
-                                            :
-                                            (
-                                                <h5 style = {{marginLeft: "25px", fontFamily: "Verdana"}}><small> ${textValue1 + ' - ' + '$' + textValue2} </small></h5>
-                                            )
-                                            }
-                                            <br></br>
-                                        </div>
-                                        <Nouislider
-                                            connect
-                                            start={[0, 1000]}
-                                            step={25}
-                                            behaviour="tap"
-                                            range={{
+            <div>
+                <div id="baselayer" className="form-control" style={{borderRightStyle: "none", zIndex: "0", borderLeftStyle: "none"}}>
+                    <div style={{backgroundColor: "white", border: "1px #ededed"}} >
+                    <div className="row">
+                        <div className="col-xs-4 col-xs-offset-3" >
+                            <div className="btn btn-group" id="white" >
+                                {textValue1 === 0 && textValue2 === 1000
+                                ?
+                                (
+                                    <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a >Any Price</a></button>
+                                )
+                                :
+                                (
+                                    <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a >${textValue1 + ' - ' + '$' + textValue2}</a></button>
+                                )
+                                }
+                                <div className="dropdown-menu"  style={{width: "450px", height: "200px"}}>
+                                    <div>
+                                        <h5 style = {{marginLeft: "25px", fontFamily: "Verdana", color: "grey"}}><small> Price Per Night  </small></h5>
+                                        {textValue1 !== 0 && textValue2 == 1000
+                                        ?
+                                        (
+                                            <h5 style = {{marginLeft: "25px", fontFamily: "Verdana"}}><small> ${textValue1 + '+'} </small></h5>
+                                        )
+                                        :
+                                        (
+                                            <h5 style = {{marginLeft: "25px", fontFamily: "Verdana"}}><small> ${textValue1 + ' - ' + '$' + textValue2} </small></h5>
+                                        )
+                                        }
+                                        <br></br>
+                                    </div>
+                                    <Nouislider
+                                        connect
+                                        start={[0, 1000]}
+                                        step={25}
+                                        behaviour="tap"
+                                        range={{
                                             min: [0],
                                             max: [1000],
-                                            }}
-                                            onSlide={this.onSlide}
-                                        />
-                                        <br></br>
-                                        <button className="btn btn-primary" onClick = {this.clear} style = {{ marginLeft: "180px", height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "120px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
-                                            Clear
-                                        </button>
-                                        <button className="btn btn-primary" onClick = {this.searchPlace} style = {{ marginLeft: "20px", height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "120px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
-                                            Apply Filter
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-xs-4 col-xs-offset-3" >
-                                <div className="btn btn-group" id="white" >
-                                    {bedroomsHigh === 0
-                                    ?
-                                    (
-                                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a >Any bedrooms</a></button>
-                                    )
-                                    :
-                                    (
-                                        <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a >{bedroomsLow + ' - ' + bedroomsHigh} bedrooms</a></button>
-                                    )
-                                    }
-                                    <div className="dropdown-menu"  style={{width: "300px", height: "300px"}}>
-                                        <div className={'form-group' + (bedroomsLow > bedroomsHigh ? ' has-error' : '')}>
-                                            <div className="row">
-                                                <div className="col-md-4 col-md-offset-3" style = {{marginLeft: "35px", width: "25%"}}>
-                                                    <div className="input-group">
-                                                        <input type="number" min = "0" placeholder="Min:" onChange = {this.changeHandler} value={this.state.bedroomsLow} name="bedroomsLow" style ={{height: "40px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control"/>
-                                                    </div>
-                                                </div>    
-                                                <div className="col-md-offset-3" style = {{marginLeft: "35px", width: "25%"}}>
-                                                    <div className="input-group">
-                                                        <input type="number" min = "0" placeholder="Max:" onChange = {this.changeHandler} value={this.state.bedroomsHigh} name="bedroomsHigh" style ={{height: "40px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control"/>
-                                                    </div>
-                                                </div>
-                                                <br></br>
-                                            </div>
-                                            {bedroomsLow > bedroomsHigh &&
-                                                <div style = {{paddingLeft: "10px", paddingRight: "10px",}}>
-                                                    <br></br>
-                                                    <div style = {{whiteSpace: "normal"}} className={`alert alert-danger`}>Minimum bedroom count may not exceed maximum bedroom count</div>
-                                                </div> 
-                                            }
-                                        </div>
-                                        <br></br>
-                                        <button className="btn btn-primary" onClick = {this.clear} style = {{ marginLeft: "20px", height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "120px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
-                                            Clear
-                                        </button>
-                                        <button className="btn btn-primary" onClick = {this.searchPlace} style = {{ marginLeft: "20px", height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "120px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
-                                            Apply Filter
-                                        </button>
-                                        </div>
-                                    </div>
+                                        }}
+                                        onSlide={this.onSlide}
+                                    />
+                                    <br></br>
+                                    <button className="btn btn-primary" onClick = {this.priceclear} style = {{ marginLeft: "180px", height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "120px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
+                                        Clear
+                                    </button>
+                                    <button className="btn btn-primary" onClick = {this.searchPlace} style = {{ marginLeft: "20px", height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "120px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
+                                        Apply Filter
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        <div  id="frontlayer"><br/><br/>
-                                <div style = {{marginLeft: "950px", marginTop: "170px",  width : "950px"}}>
-                                    <Map
-                                        id="myMap"
-                                        options={{
-                                        center: { lat: lattitude, lng:  longitude },
-                                        zoom: 8
-                                        }}
-                                        onMapLoad={map => {
-                                        var marker = new window.google.maps.Marker({
-                                            position: { lat: lattitude, lng:  longitude},
-                                            map: map,
-                                            title: locationTitle
-                                        });
-                                        }}
-                                    />
+                        <div className="col-xs-4 col-xs-offset-3" >
+                            <div className="btn btn-group" id="white" >
+                                {bedroomsHigh === 0
+                                ?
+                                (
+                                    <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a >Any bedrooms</a></button>
+                                )
+                                :
+                                (
+                                    <button id="blue" className="dropdown-toggle"  style = {{backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><a >{bedroomsLow + ' - ' + bedroomsHigh} bedrooms</a></button>
+                                )
+                                }
+                                <div className="dropdown-menu"  style={{width: "300px", height: "300px"}}>
+                                    <div className={'form-group' + (bedroomsLow > bedroomsHigh ? ' has-error' : '')}>
+                                        <div className="row">
+                                            <div className="col-md-4 col-md-offset-3" style = {{marginLeft: "35px", width: "25%"}}>
+                                                <div className="input-group">
+                                                    <input type="number" min = "0" placeholder="Min:" onChange = {this.changeHandler} value={this.state.bedroomsLow} name="bedroomsLow" style ={{height: "40px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control"/>
+                                                </div>
+                                            </div>    
+                                            <div className="col-md-offset-3" style = {{marginLeft: "35px", width: "25%"}}>
+                                                <div className="input-group">
+                                                    <input type="number" min = "0" placeholder="Max:" onChange = {this.changeHandler} value={this.state.bedroomsHigh} name="bedroomsHigh" style ={{height: "40px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}} className="form-control"/>
+                                                </div>
+                                            </div>
+                                            <br></br>
+                                        </div>
+                                        {bedroomsLow > bedroomsHigh &&
+                                            <div style = {{paddingLeft: "10px", paddingRight: "10px",}}>
+                                                <br></br>
+                                                <div style = {{whiteSpace: "normal"}} className={`alert alert-danger`}>Minimum bedroom count may not exceed maximum bedroom count</div>
+                                            </div> 
+                                        }
+                                    </div>
+                                    <br></br>
+                                    <button className="btn btn-primary" onClick = {this.bedroomsclear} style = {{ marginLeft: "20px", height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "120px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
+                                        Clear
+                                    </button>
+                                    <button className="btn btn-primary" onClick = {this.searchPlace} style = {{ marginLeft: "20px", height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "120px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
+                                        Apply Filter
+                                    </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <div  id="frontlayer"><br/><br/>
+                            <div style = {{marginLeft: "950px", marginTop: "170px",  width : "950px"}}>
+                                <Map
+                                    id="myMap"
+                                    options={{
+                                    center: { lat: lattitude, lng:  longitude },
+                                    zoom: 8
+                                    }}
+                                    onMapLoad={map => {
+                                    var marker = new window.google.maps.Marker({
+                                        position: { lat: lattitude, lng:  longitude},
+                                        map: map,
+                                        title: locationTitle
+                                    });
+                                    }}
+                                />
+                        </div>
+                    </div>
                 </div>
-                
-                {this.state.detailsFetched 
-                ?
-                (
-                <div className = "container-full">
-                    <div className="container-pad">
+            </div>
+            <div className = "container-full" >
+                <div className="container-pad">
+                    <div className="container mb-3" style = {{marginBottom: "20px !important", marginLeft: "0px", maxWidth: "860px",}}>
+                        <div className="row d-flex" style={{height: "70px", padding : "0px 0px 0px 0px"}}>
+                            <div className="w-100 px-4 py-5 d-flex flex-row flex-wrap align-items-center justify-content-between" style = {{paddingTop : "0px",}}>
+                            {detailsFetched &&
+                            (
+                                <div className="d-flex flex-row py-4 align-items-center" style={{marginLeft: "-20px",}}>
+                                    <Pagination
+                                        totalRecords={totalSearchData}
+                                        pageLimit={10}
+                                        pageNeighbours={1}
+                                        onPageChanged={this.onPageChanged}
+                                        refresh={refreshTrips}
+                                    />
+                                </div>
+                            )
+                            }
+                            {detailsFetched &&
+                            (
+                                <div className="d-flex flex-row align-items-center">
+                                    {currentPage && (
+                                        <span className="current-page d-inline-block h-100 pl-4 text-secondary" style={{fontSize: "17px",}}>
+                                        Page <span className="font-weight-bold">{currentPage}</span> /{" "}
+                                        <span className="font-weight-bold">{totalPages}</span>
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                            </div>
+                        </div>
+                    </div>
+                    {detailsFetched &&
+                    (
                         <div className="form-row">
                             <div className="form-group col-sm-8" id = "property-listings" style ={{maxWidth : "860px"}}>
                                 <div className ="Content">
                                     { this.renderSearchResult() }
                                 </div>
                             </div>
-                            
                         </div>
-                    </div>
+                    )}
                 </div>
-            
-                )
-                :
-                (
+            </div>
+            {!detailsFetched &&
+            (
                 <div className = "container-full">
-                    <div className="container-pad">
-                        <h3> <small>There are no results which match your criteria. Try refining your search parameters. </small></h3>
+                    <div className="container-pad" style={{textAlign: "center"}}>
+                    <h3> <small>There are no results which match your criteria. Try refining your search parameters.</small></h3>
                     </div>
                 </div>
-              )
-            }
+            )}
         </div>
         )
     }

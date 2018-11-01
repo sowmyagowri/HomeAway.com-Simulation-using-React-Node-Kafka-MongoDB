@@ -5,7 +5,6 @@ var router = express.Router();
 var Emails = require('../models/EmailSchema');
 
 // Set up middleware
-var jwt = require('jsonwebtoken');
 var passport = require('passport');
 var requireAuth = passport.authenticate('jwt', {session: false});
 
@@ -56,8 +55,8 @@ router.route('/getemails').post(requireAuth, function (req, res) {
 
 router.route('/getsentemails').post(requireAuth, function (req, res) {
     console.log("Inside get sent mails Request");
-  
-    Emails.find({Sender: req.body.emailID},function(err, result) {
+    console.log("req body:", req.body);
+    Emails.find({SenderEmailAddress: req.body.emailID},function(err, result) {
       console.log(result)
       if (result) {
           res.status(200).send(result);

@@ -402,7 +402,7 @@ ul.labels-info li a i {
   }
   .email-details__wrapper .email-details__header:before {
     content: "";
-    width: calc(100% - 150px);
+    width: calc(750px);
     height: 1px;
     background: #d2d2d2;
     left: 0;

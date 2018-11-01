@@ -26,7 +26,6 @@ class TravellerTripListings extends Component {
             totalPages: null,
             refreshTrips : false,
             searchString: null,
-            submitted: false,
             fromdate: null,
             todate: null,
         };
@@ -34,6 +33,7 @@ class TravellerTripListings extends Component {
         this.renderTrips = this.renderTrips.bind(this);
         this.logout = this.logout.bind(this);
         this.changeHandler = this.changeHandler.bind(this);
+        this.handleValidation = this.handleValidation.bind(this);
         this.searchProperty = this.searchProperty.bind(this);
     }
 
@@ -52,68 +52,105 @@ class TravellerTripListings extends Component {
         this.setState({ [name]: value });
     }
 
-    searchProperty = () => {
-        
+    handleValidation(){
 
-        console.log("search property");
-        const requestData = { 
-            bookedBy : cookie.load('cookie2'),
-            currentPage: 1, 
-            pageLimit: 0,
-            fromdate: this.state.fromdate,
-            todate: this.state.todate,
+        console.log("in handle")
+        let formIsValid = true;
+        
+        if(!this.state.fromdate && !this.state.todate){
+            return formIsValid;
         }
+
+        //From Date
+        if(!this.state.fromdate){
+          formIsValid = false;
+          alert("From Date is a Required field");
+          console.log("From Date cannot be empty");
+        } else {
+          var CurrentDate = new Date();
+          CurrentDate.setHours(0,0,0,0);
+          var GivenfromDate = new Date(this.state.fromdate.replace(/-/g, '\/'));
+        }
+    
+        //To Date
+        if(!this.state.todate){
+            formIsValid = false;
+            alert("To Date is a Required field");
+            console.log("To Date cannot be empty");
+        } else {
+            var CurrentDate = new Date();
+            CurrentDate.setHours(0,0,0,0);
+            var GiventoDate = new Date(this.state.todate.replace(/-/g, '\/'));
+
+            if (GiventoDate <= GivenfromDate){
+                alert('To date should be greater than from date.');
+                formIsValid = false;
+            }
+        }
+        return formIsValid;
+    }
+
+    searchProperty = () => {
 
         this.setState({
             detailsFetched: false,
-            submitted: true,
         });
-        
-        console.log(requestData),
-        this.props.travellertrips(requestData, sessionStorage.getItem('jwtToken'))
-        .then(response => {
-            if(response.payload.status === 200){
-                if (response.payload.data.length > 0){
-                    if(this.state.searchString === "" || this.state.searchString === null){
+
+        if(this.handleValidation()){
+            console.log("valid")
+            const requestData = { 
+                bookedBy : cookie.load('cookie2'),
+                currentPage: 1, 
+                pageLimit: 0,
+                fromdate: this.state.fromdate,
+                todate: this.state.todate,
+            }
+
+            this.props.travellertrips(requestData, sessionStorage.getItem('jwtToken'))
+            .then(response => {
+                if(response.payload.status === 200){
+                    if (response.payload.data.length > 0){
+                        if(this.state.searchString === "" || this.state.searchString === null){
+                            const allTrips = response.payload.data;
+                            this.setState({
+                                allTrips,
+                                detailsFetched: true,
+                                refreshTrips: true,
+                            });
+                        } else {
+                            var text = this.state.searchString.toLowerCase();
+                            const allTrips = response.payload.data;
+                            let searchedTrips1 = allTrips.filter((row) => {
+                                return row.propertyDetails[0].headline.toLowerCase().includes(text);
+                            });
+                            if (searchedTrips1.length > 0){
+                                this.setState ({
+                                    allTrips : searchedTrips1,
+                                    detailsFetched: true,
+                                    refreshTrips: true,
+                                })
+                            } else {
+                                this.setState ({
+                                    allTrips : searchedTrips1,
+                                    detailsFetched: false,
+                                    refreshTrips: false,
+                                })
+                            }
+                        }
+                    } else {
                         const allTrips = response.payload.data;
                         this.setState({
                             allTrips,
-                            detailsFetched: true,
-                            refreshTrips: true,
+                            detailsFetched: false,
+                            refreshTrips: false,
                         });
-                    } else {
-                        var text = this.state.searchString.toLowerCase();
-                        const allTrips = response.payload.data;
-                        let searchedTrips1 = allTrips.filter((row) => {
-                            return row.propertyDetails[0].headline.toLowerCase().includes(text);
-                        });
-                        if (searchedTrips1.length > 0){
-                            this.setState ({
-                                allTrips : searchedTrips1,
-                                detailsFetched: true,
-                                refreshTrips: true,
-                            })
-                        } else {
-                            this.setState ({
-                                allTrips : searchedTrips1,
-                                detailsFetched: false,
-                                refreshTrips: false,
-                            })
-                        }
                     }
-                } else {
-                    const allTrips = response.payload.data;
-                    this.setState({
-                        allTrips,
-                        detailsFetched: false,
-                        refreshTrips: false,
-                    });
                 }
-            }
-        })
-        .catch (error => {
-            console.log(error);
-        });
+            })
+            .catch (error => {
+                console.log(error);
+            });
+        }
     } 
 
     onPageChanged = data => {
@@ -306,55 +343,55 @@ class TravellerTripListings extends Component {
                     </div>
                 </div>
                 <div className = "container-full" >
-                        <div className="container-pad">
-                            <div className="container mb-3" style = {{marginBottom: "20px !important"}}>
-                                <div className="row d-flex" style={{height: "70px", padding : "0px 0px 0px 0px"}}>
-                                    <div className="w-100 px-4 py-5 d-flex flex-row flex-wrap align-items-center justify-content-between" style = {{paddingTop : "0px",}}>
-                                    {detailsFetched &&
-                                    (
-                                        <div className="d-flex flex-row py-4 align-items-center" style={{marginLeft: "-20px"}}>
-                                            <Pagination
-                                                totalRecords={totalTrips}
-                                                pageLimit={5}
-                                                pageNeighbours={1}
-                                                onPageChanged={this.onPageChanged}
-                                                refresh={refreshTrips}
-                                            />
-                                        </div>
-                                    )
-                                    }
-                                    {detailsFetched &&
-                                    (
-                                        <div className="d-flex flex-row align-items-center">
-                                            {currentPage && (
-                                                <span className="current-page d-inline-block h-100 pl-4 text-secondary" style={{fontSize: "17px",}}>
-                                                Page <span className="font-weight-bold">{currentPage}</span> /{" "}
-                                                <span className="font-weight-bold">{totalPages}</span>
-                                                </span>
-                                            )}
-                                        </div>
-                                    )}
+                    <div className="container-pad">
+                        <div className="container mb-3" style = {{marginBottom: "20px !important"}}>
+                            <div className="row d-flex" style={{height: "70px", padding : "0px 0px 0px 0px"}}>
+                                <div className="w-100 px-4 py-5 d-flex flex-row flex-wrap align-items-center justify-content-between" style = {{paddingTop : "0px",}}>
+                                {detailsFetched &&
+                                (
+                                    <div className="d-flex flex-row py-4 align-items-center" style={{marginLeft: "-20px"}}>
+                                        <Pagination
+                                            totalRecords={totalTrips}
+                                            pageLimit={5}
+                                            pageNeighbours={1}
+                                            onPageChanged={this.onPageChanged}
+                                            refresh={refreshTrips}
+                                        />
                                     </div>
+                                )
+                                }
+                                {detailsFetched &&
+                                (
+                                    <div className="d-flex flex-row align-items-center">
+                                        {currentPage && (
+                                            <span className="current-page d-inline-block h-100 pl-4 text-secondary" style={{fontSize: "17px",}}>
+                                            Page <span className="font-weight-bold">{currentPage}</span> /{" "}
+                                            <span className="font-weight-bold">{totalPages}</span>
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
                                 </div>
                             </div>
-                            {detailsFetched &&
-                            (
-                                <div className="form-row myformrow">
-                                    <div className="form-group col-sm-9" id = "property-listings" style ={{maxWidth : "900px"}}>
-                                        { this.renderTrips() }
-                                    </div>
+                        </div>
+                        {detailsFetched &&
+                        (
+                            <div className="form-row myformrow">
+                                <div className="form-group col-sm-9" id = "property-listings" style ={{maxWidth : "900px"}}>
+                                    { this.renderTrips() }
                                 </div>
-                            )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+                {!detailsFetched &&
+                (
+                    <div className = "container-full">
+                        <div className="container-pad" style={{textAlign: "center"}}>
+                            <h1> No Trips Found! </h1>
                         </div>
                     </div>
-                    {!detailsFetched &&
-                    (
-                        <div className = "container-full">
-                            <div className="container-pad" style={{textAlign: "center"}}>
-                                <h1> No Trips Found! </h1>
-                            </div>
-                        </div>
-                    )}
+                )}
             </div>
         )
   }

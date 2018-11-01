@@ -33,13 +33,14 @@ function propertylistings(msg, callback){
 
     var query = {}; // declare the query object
     query['$and']=[{listedBy:msg.body.listedBy}]; // filter the search by any criteria given by the user
-    if( (msg.body.fromdate && !msg.body.todate) ){
-        console.log("here")
-        query['$and'].push( {startDate: {$gte: msg.body.fromdate }});
-    }
-    if( (!msg.body.fromdate && msg.body.todate) ){
-        query['$and'].push( {endDate: {$lte: msg.body.todate}});
-    }
+    console.log(msg.body.fromdate);
+    // if( (msg.body.fromdate && !msg.body.todate) ){
+    //     console.log("here")
+    //     query['$and'].push( {endDate: {$gte: msg.body.fromdate }});
+    // }
+    // if( (!msg.body.fromdate && msg.body.todate) ){
+    //     query['$and'].push( {startDate: {$gte: msg.body.todate}});
+    // }
     if( (msg.body.fromdate && msg.body.todate) ){
         query['$and'].push( {startDate: {$lte: msg.body.fromdate }}, {endDate: {$gte: msg.body.todate} });
     }
@@ -87,7 +88,7 @@ function propertylistings(msg, callback){
               console.log(error);
             } else {
               console.log("Property Found");
-              console.log(result);
+              //console.log(result);
               callback(null, {status: 200, result: result});
             }
         })
@@ -115,30 +116,59 @@ function propertysearch(msg, callback){
                         for(var i in bookings) {
                             bookingsArray.push(bookings[i].propertyID);
                         }
-
                         if (msg.body.bedroomsHigh === 0){
-                            console.log("in if");
-                            Properties.find( {$and: [ {_id: {$nin: bookingsArray} }, {city: msg.body.city.toLowerCase()}, {startDate: {$lte: Date(msg.body.startDate) }}, {endDate: {$gte: Date(msg.body.endDate)}}, {sleeps: {$gte: msg.body.noOfGuests}}, {$and: [ {baseRate: {$gte: msg.body.priceLow}}, {baseRate: {$lte: msg.body.priceHigh}} ] } ] }, function(error,result){
-                            if (error) {
-                                console.log(error);
-                                console.log("Property not found");
-                                callback(error, "Property not found");
-                            } else {
-                                console.log("Property Found");
-                                callback(null, {status: 200, result: result});
-                            }
-                            });
+                            Properties.find( {$and: 
+                                            [ {_id: {$nin: bookingsArray} }, 
+                                            {city: msg.body.city.toLowerCase()}, 
+                                            {startDate: {$lte: new Date(msg.body.startDate) }}, 
+                                            {endDate: {$gte: new Date(msg.body.endDate)}}, 
+                                            {sleeps: {$gte: msg.body.noOfGuests}}, 
+                                            {$and: 
+                                                [ {baseRate: {$gte: msg.body.priceLow}},
+                                                  {baseRate: {$lte: msg.body.priceHigh}} 
+                                            ]} 
+                                            ]})
+                                        .limit(msg.body.pageLimit)
+                                        .skip(msg.body.pageLimit * (msg.body.currentPage - 1) )
+                                        .exec(function(error,result){
+                                        if (error) {
+                                            console.log(error);
+                                            console.log("Property not found");
+                                            callback(error, "Property not found");
+                                        } else {
+                                            console.log("Property Found");
+                                            callback(null, {status: 200, result: result});
+                                        }
+                                        });
                         } else {
-                            Properties.find( {$and: [ {_id: {$nin: bookingsArray} }, {city: msg.body.city.toLowerCase()}, {startDate: {$lte: Date(msg.body.startDate) }}, {endDate: {$gte: Date(msg.body.endDate)}}, {sleeps: {$gte: msg.body.noOfGuests}}, {$and: [ {baseRate: {$gte: msg.body.priceLow}}, {baseRate: {$lte: msg.body.priceHigh}} ] }, {$and: [ {bedrooms: {$gte: msg.body.bedroomsLow}}, {bedrooms: {$lte: msg.body.bedroomsHigh}} ] } ] }, function(error,result){
-                                if (error) {
-                                    console.log(error);
-                                    console.log("Property not found");
-                                    callback(error, "Property not found");
-                                } else {
-                                    console.log("Property Found");
-                                    callback(null, {status: 200, result: result});
-                                }
-                            });
+                            Properties.find( {$and: 
+                                        [ {_id: {$nin: bookingsArray} }, 
+                                            {city: msg.body.city.toLowerCase()}, 
+                                            {startDate: {$lte: new Date(msg.body.startDate) }}, 
+                                            {endDate: {$gte: new Date(msg.body.endDate)}}, 
+                                            {sleeps: {$gte: msg.body.noOfGuests}}, 
+                                            {$and: 
+                                                [ {baseRate: {$gte: msg.body.priceLow}}, 
+                                                {baseRate: {$lte: msg.body.priceHigh}} 
+                                            ]},
+                                            {$and: 
+                                                [ {bedrooms: {$gte: msg.body.bedroomsLow}},
+                                                    {bedrooms: {$lte: msg.body.bedroomsHigh}} 
+                                            ]} 
+                                        ] })
+                                        .limit(msg.body.pageLimit)
+                                        .skip(msg.body.pageLimit * (msg.body.currentPage - 1) )
+                                        .exec(function(error,result){
+                                            if (error) {
+                                                console.log(error);
+                                                console.log("Property not found");
+                                                callback(error, "Property not found");
+                                            } else {
+                                                console.log("Property Found");
+                                                console.log(result);
+                                                callback(null, {status: 200, result: result});
+                                            }
+                                        })
                         }
                     }
                 })
@@ -167,13 +197,13 @@ function triplistings(msg, callback){
 
     var query = {}; // declare the query object
     query['$and']=[{bookedBy:msg.body.bookedBy}]; // filter the search by any criteria given by the user
-    if( (msg.body.fromdate && !msg.body.todate) ){
-        console.log("here")
-        query['$and'].push( {bookedFrom: {$gte: msg.body.fromdate }});
-    }
-    if( (!msg.body.fromdate && msg.body.todate) ){
-        query['$and'].push( {bookedTo: {$lte: msg.body.todate}});
-    }
+    // if( (msg.body.fromdate && !msg.body.todate) ){
+    //     console.log("here")
+    //     query['$and'].push( {bookedFrom: {$gte: msg.body.fromdate }});
+    // }
+    // if( (!msg.body.fromdate && msg.body.todate) ){
+    //     query['$and'].push( {bookedTo: {$lte: msg.body.todate}});
+    // }
     if( (msg.body.fromdate && msg.body.todate) ){
         query['$and'].push( {bookedFrom: {$lte: msg.body.fromdate }}, {bookedTo: {$gte: msg.body.todate} });
     }
@@ -210,7 +240,7 @@ function triplistings(msg, callback){
               console.log(error);
             } else {
               console.log("Trips Found");
-              console.log(result);
+              //console.log(result);
               callback(null, {status: 200, result});
             }
         });
