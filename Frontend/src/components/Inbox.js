@@ -11,31 +11,31 @@ import TabList from 'react-web-tabs/lib/TabList';
 import { reduxForm } from "redux-form";
 import { connect } from "react-redux";
 import Popup from "reactjs-popup";
-import {replytoemail, getemails, getsentemails} from '../actions/inbox_actions';
+import {sendmail, getemails, getsentemails} from '../actions/inbox_actions';
 
 const $ = window.$;
 
 class Inbox extends Component {
 
-  constructor(props){
+    constructor(props){
         super(props);
         this.state = { 
-          isTravelerlogin : false, 
-          isinboxempty : false, 
+          isTravelerlogin : false,
           alert: null, 
           sentemails : [{}],
           emails : [{}],
           currentEmailId : "",
           currentSentEmailId : "",
           open: false,
-          mailreply : ""
+          mailReply : ""
         }
         this.logout = this.logout.bind(this);
         this.openEmail = this.openEmail.bind(this);
         this.openSentEmail = this.openSentEmail.bind(this);
-        this.openModal = this.openModal.bind(this);
-        this.closeModal = this.closeModal.bind(this);
-        this.handlemessage = this.handlemessage.bind(this);
+        this.openPopup = this.openPopup.bind(this);
+        this.closePopup = this.closePopup.bind(this);
+        this.sendReply = this.sendReply.bind(this);
+        this.changeMessageHandler = this.changeMessageHandler.bind(this);
     }
 
     openEmail(_id) {
@@ -50,25 +50,24 @@ class Inbox extends Component {
         });
     };
     
-    handlemessage = (event) => {
+    changeMessageHandler = (event) => {
         this.setState ({
-            mailreply : event.target.value
+            mailReply : event.target.value
         })
     }
     
-    openModal = () => {
+    openPopup = () => {
         this.setState({ open: true });
     };
       
-    closeModal = () => {
+    closePopup = () => {
         this.setState({ open: false });
     };
 
     hideAlert() {
-      console.log('Hiding alert...');
-      this.setState({
-        alert: null
-      });
+        this.setState({
+            alert: null
+        });
     }
 
     logout = () => {
@@ -77,170 +76,203 @@ class Inbox extends Component {
         cookie.remove('cookie3', {path: '/'})
         console.log("All cookies removed!")
         window.location = "/"
-      }
-
-  componentDidMount() {
-    var emailfromcookie = cookie.load('cookie2');
-    var data = {emailID: emailfromcookie};
-        
-    this.props.getemails(data, sessionStorage.getItem('jwtToken')).then(response => {
-        console.log("Status Code : ",response.payload.status);
-        if(response.payload.status === 200){
-            if(response.payload.data.length === 0){
-                this.setState ({
-                    isLoading : false,
-                    isinboxempty : true
-                })
-            } else {
-                this.setState ({
-                    emails : response.payload.data,
-                    isLoading : false,
-                    isinboxempty : false,
-                    currentEmailId :response.payload.data[0]._id
-                })
-                console.log(this.state.emails)
-            }
-        }
-    });
-
-    this.props.getsentemails(data, sessionStorage.getItem('jwtToken')).then(response => {
-        console.log("Status Code : ",response.payload.status);
-        if(response.payload.status === 200){
-            if(response.payload.data.length === 0){
-                this.setState ({
-                    isLoading : false,
-                    issentboxempty : true
-                })
-                
-            } else {
-                this.setState ({
-                    sentemails : response.payload.data,
-                    isLoading : false,
-                    issentboxempty : false,
-                    currentSentEmailId :response.payload.data[0]._id
-                })
-                console.log(this.state.sentemails)
-            }
-        }
-    });
-   }
-
-  render(){
-
-    var currentEmailState = this.state.emails.find(x => x._id === this.state.currentEmailId);
-    var currentSentEmailState = this.state.sentemails.find(x => x._id === this.state.currentSentEmailId);
-
-    var travelername = null;
-    /* redirect based on successful login */
-    let redirectVar = null;
-    if(!cookie.load('cookie1')){
-        redirectVar = <Redirect to= "/"/> 
-    } else {
-        this.state.isTravelerLoggedIn = true;
-        travelername = cookie.load('travelername')
     }
 
-      return(
-        <div>
-        {redirectVar}
-        <Navbar inverse collapseOnSelect>
-                    <Navbar.Header>
-                        <Navbar.Brand>
-                            <a href="/" title = "HomeAway" className = "logo"><img src={require('./homeaway_logo.png')} alt="Homeaway Logo"/></a>
-                        </Navbar.Brand> 
-                        <div className="col-sm-12 col-sm-offset-8" style={{ marginBottom: "-2rem", left: "400px", fontSize: "18px"}}>
-                        {this.state.message &&
-                            <div className={`alert alert-success`}>{this.state.message}</div>
+    sendReply = (email, mailReply) => {
+        var data = {
+            sender : cookie.load('cookie3') + ' ' + cookie.load('cookie4'),
+            senderEmailAddress : cookie.load('cookie2'),
+            receiver : email.senderEmailAddress,
+            _id : email._id,
+            propertyID : email.propertyID,
+            city : email.city,
+            propertyHeadline : email.propertyHeadline,
+            arrivalDate : email.arrivalDate,
+            departDate : email.departDate,
+            noOfGuests : email.noOfGuests,
+            mailContent : email.mailContent + '\n\n' + 'Response :' + '\n\n' + mailReply,
+            replied : false
+        }
+
+        console.log(data)
+        this.props.sendmail(data, sessionStorage.getItem('jwtToken')).then(response => {
+            console.log("Status Code for send mail: ",response.payload.status);
+            if(response.payload.status === 200){
+                console.log("Message successfully sent")
+                var data = {emailID: cookie.load('cookie2')};
+                this.props.getsentemails(data, sessionStorage.getItem('jwtToken')).then(response => {
+                    console.log("Status Code : ",response.payload.status);
+                    if(response.payload.status === 200){
+                        if(response.payload.data.length > 0){
+                            this.setState ({
+                                sentemails : response.payload.data,
+                                isLoading : false,
+                                issentboxempty : false,
+                                currentSentEmailId :response.payload.data[0]._id
+                            })
+                            console.log("sent emails",this.state.sentemails)
                         }
-                        </div>
-                    </Navbar.Header>
-                    <div>
-                        {(cookie.load('cookie1') === 'travellercookie') 
-                        ?
-                        (
-                        <div className="btn btn-group" id="white">
-                            <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
-                            <div className="dropdown-menu">
-                                <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
-                                <a className="dropdown-item" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a>
-                                <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
-                                <a className="dropdown-item"  onClick= {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
-                            </div>
-                        </div>
-                        )
-                        :
-                        (
-                        <div className="btn btn-group" id="white">
-                            <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
-                            <div className="dropdown-menu">
-                                <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
-                                <a className="dropdown-item" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a>
-                                <a className="dropdown-item" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a>
-                                <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
-                                <a className="dropdown-item" onClick = {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
-                            </div>
-                        </div>
-                        )
                     }
-                    <img style={{marginLeft: "50px"}} src={require('./logo.png')} alt="Homeaway Logo"/>
-                    </div>
-                </Navbar>
-                <div className="container">
-                </div>
-                <div style={{backgroundColor: "white", borderLeftColor:"white",borderRightColor:"white",borderBottomColor: "#d6d7da", borderTopColor: "#d6d7da", borderStyle: "solid"}}>
-                {(cookie.load('cookie1') === 'travellercookie') 
-                ?
-                (
-                    <div id="conttab" className="container">
-                        <ul id="ulinktab">
-                            <li id="ulinktab" className="one"><a id="linktab" > <i className="fas fa-envelope"></i> Inbox</a></li>
-                            <li id="ulinktab" className="two"><a id="linktab" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a></li>
-                            <li id="ulinktab" className="three"><a id="linktab" href="/Profile"> <i className="fas fa-user"></i> My Profile</a></li>
-                            <hr id="hrtab4" />
-                        </ul>
-                    </div>
-                )
-                :
-                (
-                    <div id="conttab" className="container">
-                        <ul id="ulinktab">
-                            <li id="ulinktab" className="one"><a id="linktab" > <i className="fas fa-envelope"></i> Inbox</a></li>
-                            <li id="ulinktab" className="two"><a id="linktab" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a></li>
-                            <li id="ulinktab" className="three"><a id="linktab" href="/Profile"> <i className="fas fa-user"></i> My Profile</a></li>
-                            <li id="ulinktab" className="four"><a id="linktab" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a></li>
-                            <hr id="hrtab4" />
-                        </ul>
-                    </div>
-                )
+                });
+            }
+        });
+        this.setState({ open: false });
+    }
+
+    componentDidMount() {
+        var emailfromcookie = cookie.load('cookie2');
+        var data = {emailID: emailfromcookie};
+            
+        this.props.getemails(data, sessionStorage.getItem('jwtToken')).then(response => {
+            console.log("Status Code : ",response.payload.status);
+            if(response.payload.status === 200){
+                if(response.payload.data.length === 0){
+                    this.setState ({
+                        isLoading : false,
+                    })
+                } else {
+                    this.setState ({
+                        emails : response.payload.data,
+                        isLoading : false,
+                        currentEmailId :response.payload.data[0]._id
+                    })
                 }
+            }
+        });
+
+        this.props.getsentemails(data, sessionStorage.getItem('jwtToken')).then(response => {
+            console.log("Status Code : ",response.payload.status);
+            if(response.payload.status === 200){
+                if(response.payload.data.length === 0){
+                    this.setState ({
+                        isLoading : false,
+                        issentboxempty : true
+                    })
+                    
+                } else {
+                    this.setState ({
+                        sentemails : response.payload.data,
+                        isLoading : false,
+                        issentboxempty : false,
+                        currentSentEmailId :response.payload.data[0]._id
+                    })
+                    console.log("sent emails",this.state.sentemails)
+                }
+            }
+        });
+    }
+
+    render(){
+
+        var currentEmailState = this.state.emails.find(x => x._id === this.state.currentEmailId);
+        var currentSentEmailState = this.state.sentemails.find(x => x._id === this.state.currentSentEmailId);
+
+        var travelername = null;
+        /* redirect based on successful login */
+        let redirectVar = null;
+        if(!cookie.load('cookie1')){
+            redirectVar = <Redirect to= "/"/> 
+        } else {
+            this.state.isTravelerLoggedIn = true;
+            travelername = cookie.load('travelername')
+        }
+
+        return(
+            <div>
+            {redirectVar}
+            <Navbar inverse collapseOnSelect>
+                <Navbar.Header>
+                    <Navbar.Brand>
+                        <a href="/" title = "HomeAway" className = "logo"><img src={require('./homeaway_logo.png')} alt="Homeaway Logo"/></a>
+                    </Navbar.Brand> 
+                    <div className="col-sm-12 col-sm-offset-8" style={{ marginBottom: "-2rem", left: "400px", fontSize: "18px"}}>
+                    {this.state.message &&
+                        <div className={`alert alert-success`}>{this.state.message}</div>
+                    }
+                    </div>
+                </Navbar.Header>
+                <div>
+                    {(cookie.load('cookie1') === 'travellercookie') 
+                    ?
+                    (
+                    <div className="btn btn-group" id="white">
+                        <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                        <div className="dropdown-menu">
+                            <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
+                            <a className="dropdown-item" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a>
+                            <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
+                            <a className="dropdown-item"  onClick= {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                    )
+                    :
+                    (
+                    <div className="btn btn-group" id="white">
+                        <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                        <div className="dropdown-menu">
+                            <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
+                            <a className="dropdown-item" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a>
+                            <a className="dropdown-item" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a>
+                            <a className="dropdown-item" href="/Profile"> <i className="fas fa-user"></i> My Profile</a>
+                            <a className="dropdown-item" onClick = {this.logout}> <i className="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                    )
+                }
+                <img style={{marginLeft: "50px"}} src={require('./logo.png')} alt="Homeaway Logo"/>
                 </div>
+            </Navbar>
+            <div className="container">
+            </div>
+            <div style={{backgroundColor: "white", borderLeftColor:"white",borderRightColor:"white",borderBottomColor: "#d6d7da", borderTopColor: "#d6d7da", borderStyle: "solid"}}>
+            {(cookie.load('cookie1') === 'travellercookie') 
+            ?
+            (
+                <div id="conttab" className="container">
+                    <ul id="ulinktab">
+                        <li id="ulinktab" className="one"><a id="linktab" > <i className="fas fa-envelope"></i> Inbox</a></li>
+                        <li id="ulinktab" className="two"><a id="linktab" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a></li>
+                        <li id="ulinktab" className="three"><a id="linktab" href="/Profile"> <i className="fas fa-user"></i> My Profile</a></li>
+                        <hr id="hrtab4" />
+                    </ul>
+                </div>
+            )
+            :
+            (
+                <div id="conttab" className="container">
+                    <ul id="ulinktab">
+                        <li id="ulinktab" className="one"><a id="linktab" > <i className="fas fa-envelope"></i> Inbox</a></li>
+                        <li id="ulinktab" className="two"><a id="linktab" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a></li>
+                        <li id="ulinktab" className="three"><a id="linktab" href="/Profile"> <i className="fas fa-user"></i> My Profile</a></li>
+                        <li id="ulinktab" className="four"><a id="linktab" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a></li>
+                        <hr id="hrtab4" />
+                    </ul>
+                </div>
+            )
+            }
+            </div>
             <div className = "container" id = "col" style ={{marginLeft : "10px", maxWidth : "1500px"}}>
-                <Tabs defaultTab="vertical-tab-one" vertical>
+                <Tabs defaultTab="inbox-tab1" vertical>
                     <div className= "row form-group">
                         <div className = "col-md-2">
                             <ul className="inbox-nav inbox-divider">
                                 <TabList >
                                     <div className="row">
-                                        <Tab tabFor="vertical-tab-one">
+                                        <Tab tabFor="inbox-tab1" style={{backgroundColor: "rgb(142, 238, 233)"}} >
                                         <i className="fas fa-inbox-in"></i>
                                             <li><i className="fas fa-inbox"></i>&nbsp;&nbsp;Inbox</li>
                                         </Tab>
                                     </div>
                                     <div className="row">
-                                        <Tab tabFor="vertical-tab-two">
+                                        <Tab tabFor="inbox-tab2" style={{backgroundColor: "rgb(142, 238, 233)"}}>
                                             <li><i className="fas fa-external-link-alt"></i>&nbsp;&nbsp;Sent Mail</li>
-                                        </Tab>
-                                    </div>
-                                    <div className="row">
-                                        <Tab tabFor="vertical-tab-three">
-                                            <li><i className="far fa-trash-alt"></i>&nbsp;&nbsp;Trash</li>
                                         </Tab>
                                     </div>
                                 </TabList>
                             </ul>
                         </div>
                         <div className= "col-md-10">
-                            <TabPanel tabId="vertical-tab-one">
+                            <TabPanel tabId="inbox-tab1">
                             <aside className="lg-side" style = {{marginTop : "10px"}}>
                                 <div id = "tab1">
                                     <div className="inbox-head">
@@ -252,39 +284,17 @@ class Inbox extends Component {
                                             <EmailList 
                                                 emails={this.state.emails} 
                                                 getSelectedEmail={this.openEmail} 
-                                                selectedEmail={currentEmailState}/>
+                                                selectedEmail={currentEmailState}
+                                                fromInbox={true}
+                                            />
                                             <EmailDetails 
                                                 email={currentEmailState}
                                                 open = {this.state.open}
-                                                mailreply = {this.state.mailreply}
-                                                openModal = {this.openModal}
-                                                closeModal = {this.closeModal}
-                                                handlemessage = {this.handlemessage}
-                                                handlesend = {(email, mailreply) => {
-                                                    var data = {
-                                                        sendername : cookie.load('cookie3') + ' ' + cookie.load('cookie4'),
-                                                        senderemail : cookie.load('cookie2'),
-                                                        receiver : email.Sender,
-                                                        _id : email._id,
-                                                        propertyid : email.PropertyID,
-                                                        propertylocated : email.City,
-                                                        propertyheader : email.PropertyHeader,
-                                                        checkin : email.Arrivaldate,
-                                                        checkout : email.Departdate,
-                                                        guests : email.Guests,
-                                                        mailcontent : email.MailContent + '\n\n' + 'Response :' + '\n\n' + mailreply,
-                                                        reply : false
-                                                    }
-                                            
-                                                    console.log(data)
-                                                    this.props.replytoemail(data, sessionStorage.getItem('jwtToken')).then(response => {
-                                                        if(response.payload.status === 200){
-                                                            console.log("Message successfully sent")
-                                                        }
-                                                    });
-                                                    this.setState({ open: false });
-                                                    
-                                                }}
+                                                mailReply = {this.state.mailReply}
+                                                openPopup = {this.openPopup}
+                                                closePopup = {this.closePopup}
+                                                changeMessageHandler = {this.changeMessageHandler}
+                                                sendReply = {this.sendReply}
                                                 />
                                             </div>
                                         </div>
@@ -292,35 +302,29 @@ class Inbox extends Component {
                                 </div>
                             </aside>
                             </TabPanel>
-                            <TabPanel tabId="vertical-tab-two">
-                            <aside className="lg-side" style = {{marginTop : "10px"}}>
-                                <div id = "tab2">
-                                    <div className="inbox-head">
-                                        <h3>Sent Mail</h3>
-                                    </div> 
-                                    <div className="inbox-body">
-                                        <div className="email-app__wrapper">
-                                            <div className="row">
-                                            <EmailList 
-                                                emails={this.state.sentemails} 
-                                                getSelectedEmail={this.openSentEmail} 
-                                                selectedEmail={currentSentEmailState}/>
-                                            <SentEmailDetails 
-                                                email={currentSentEmailState} />
+                            <TabPanel tabId="inbox-tab2">
+                                <aside className="lg-side" style = {{marginTop : "10px"}}>
+                                    <div id = "tab2">
+                                        <div className="inbox-head">
+                                            <h3>Sent Mail</h3>
+                                        </div> 
+                                        <div className="inbox-body">
+                                            <div className="email-app__wrapper">
+                                                <div className="row">
+                                                <EmailList 
+                                                    emails={this.state.sentemails} 
+                                                    getSelectedEmail={this.openSentEmail} 
+                                                    selectedEmail={currentSentEmailState}
+                                                    fromInbox={false}
+                                                />
+                                                <SentEmailDetails 
+                                                    email={currentSentEmailState}
+                                                />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </aside>
-                            </TabPanel>
-                            <TabPanel tabId="vertical-tab-three">
-                            <aside className="lg-side" style = {{marginTop : "10px"}}>
-                                <div id = "tab3">
-                                    <div className="inbox-head">
-                                        <h3>Trash</h3>
-                                    </div> 
-                                </div>
-                            </aside>
+                                </aside>
                             </TabPanel>
                         </div>
                     </div>
@@ -331,42 +335,10 @@ class Inbox extends Component {
     }
 }
 
-
-const Compose = ({closeCompose, sendMessage }) => {
-    return (
-        <div className="compose-email__wrapper">
-            <div className="compose-email__content">
-                <div className="compose-email__message">
-                    <div className="compose-email__header" onClick={() => closeCompose()}>
-                        New Message
-                        <span  className="white pull-right">
-                        <i className="fa fa-times" aria-hidden="true"></i>
-                        </span>
-                    </div>
-                
-                    <div className="compose-email__body">
-                        <div className="compose-email__toemail">
-                        <input placeholder="To:"/>
-                        </div>
-                        <div className="compose-email__subject">
-                        <input placeholder="Subject:"/>
-                        </div>
-                        <div className="compose-email__message-content">
-                        <textarea rows="6" placeholder="Type Your Message Here"></textarea>
-                        </div>
-                    </div>
-                    <div className="compose-email__footer">
-                        <button>Send</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-};
-
-const EmailList = ({emails, getSelectedEmail, selectedEmail }) => {
-    let emailList = emails.map(function(email, i) {    
-        return <EmailListItem email={email} openEmail={getSelectedEmail} selected={selectedEmail === email}/>
+const EmailList = ({emails, getSelectedEmail, selectedEmail, fromInbox }) => {
+    
+   let emailList = emails.map(function(email, i) {    
+            return <EmailListItem fromInbox={fromInbox} email={email} openEmail={getSelectedEmail} selected={selectedEmail === email}/>
     })
     return (
         <div className="email-list__wrapper col-md-4">
@@ -387,40 +359,56 @@ const prettyDate = (d) => {
     let day = newdate[2];
     let year = newdate[0];
     let time = date.split("T")[1].split(":");
-    // console.log(month + " " + day + ", " + year + ' ' + time[0] + ':' + time[1])
     return month + " " + day + ", " + year + ' ' + time[0] + ':' + time[1] }
     else {
         return 0
     }
 }
 
-const EmailListItem = ({ email, openEmail, selected  }) => {
+const EmailListItem = ({ email, openEmail, selected, fromInbox  }) => {
+
     var classes = "email-item";
     if(selected) {
-        classes += " active unread";
+        classes += " active";
     }
-        
+
+    console.log(classes);
+    
     return (
+       
         <div className={classes} onClick={() => openEmail(email._id)}>
-            <div className="email-item__name">{!email.Replied ? <div className ="dot"></div> : (null)}&nbsp;&nbsp;{email.Sender}</div>
-            <div className="email-item__subject" >
-            <strong>{email.Header}</strong>
+            <div className="email-item__name">
+                {!email.replied && fromInbox
+                ? 
+                    <div className ="dot">
+                    </div> 
+                : 
+                (
+                    null
+                )}
+                &nbsp;
+                {email.sender}
             </div>
-            <div className="email-item__time">{prettyDate(email.TimeReceived)}</div> 
-            <div className="email-item__message" style = {{textOverflow: "ellipsis", overflow: "hidden",
-whiteSpace: "nowrap"}}>{email.MailContent}</div>
-        </div>  
+            <div className="email-item__time" >
+                {prettyDate(email.timeReceived)}
+            </div>
+            <div className="email-item__subject" >
+                <strong>{email.propertyHeadline}</strong>
+            </div>
+            <div className="email-item__message" style = {{textOverflow: "ellipsis", overflow: "hidden",whiteSpace: "nowrap"}}>
+                {email.mailContent}
+            </div>
+        </div>
     );
 };
 
-
-const SentEmailDetails = ({email}) =>{
+const EmailDetails = ({ email, open , mailReply, openPopup, closePopup, changeMessageHandler, sendReply}) => {
     if(!email) {
         return (
             <div className="email-details__wrapper">
                 <div className="empty-container">
                     <div className="empty-container__content">
-                        
+                        {/* To not display the expanded email details div in case of no emails */}
                     </div>
                 </div>
             </div>
@@ -428,114 +416,47 @@ const SentEmailDetails = ({email}) =>{
     }
 
     return (
-        <div className="email-details__wrapper col-md-8">
+        <div className="email-details__wrapper col-md-8" style={{background: "rgba(0, 123, 255, 0.09)",}}>
             <div className="email-details__container">
                 <div className="email-details__header">
-                <div className="email-details__info">
-                    <h5>{email.Sender} {"<"}{email.SenderEmailAddress}{">"}</h5>
-                    <span className="pull-right">{prettyDate(email.TimeReceived)}</span>
-                </div>
-                <div className="email-details__info">
-                    <strong>{email.PropertyHeader}</strong></div>
-                <div className="email-details__info">
-                    <strong>{email.City}</strong></div>
-                <div className="email-details__info">
-                    <strong>Check In&nbsp;&nbsp;: {email.Arrivaldate}</strong></div>
-                <div className="email-details__info">
-                    <strong>Check Out : {email.Departdate}</strong></div>
-                <div className="email-details__info">
-                    <strong>Guests : {email.Guests}</strong>
-                </div>
-                <div className="email-details__buttons">
+                    <a onClick={openPopup} style={{float: "right"}}><i className="fa fa-reply fa-3x"></i></a>
                     <div className="email-details__mark">
-                    </div>
-                </div>
-                <div className="email-details__message" style = {{whiteSpace : "pre-wrap"}}>
-                    <h6 style = {{color :"#5e6d77", fontSize : "18px"}}>{email.MailContent}</h6>
-                </div>
-            </div>
-            </div>
-        </div>
-    )
-}
-
-const EmailDetails = ({ email, open , mailreply, openModal, closeModal, handlemessage, handlesend}) => {
-    if(!email) {
-        return (
-            <div className="email-details__wrapper">
-                <div className="empty-container">
-                    <div className="empty-container__content">
-                        
-                    </div>
-                </div>
-            </div>
-        )
-    }
-
-    return (
-        <div className="email-details__wrapper col-md-8">
-            <div className="email-details__container">
-                <div className="email-details__header">
-                    <a onClick={openModal} style={{float: "right"}}><i class="fa fa-reply fa-3x"></i></a>
-                    <div className="email-details__mark">
-                        <Popup open ={open} closeOnDocumentClick onClose={closeModal}>
+                        <Popup open ={open} closeOnDocumentClick onClose={closePopup}>
                             <div>
-                                <div className="modal1">
-                                    <a className="close" onClick={closeModal}>&times;</a>
+                            <   div className="popup1">
+                                    <a className="close" onClick={closePopup}>&times;</a>
                                     <div className="header" style = {{marginTop : "30px"}}>
                                         <h2>Compose Message</h2>
                                     </div>
                                     <hr/>
                                     <div className="content">
                                         <div className="row">
-                                            <div id="floatContainer3" className="float-container">
-                                                <label htmlFor="floatField3">Email Address</label>
-                                                <input type = 'text' value ={email.SenderEmailAddress} readOnly/>
+                                            <div id="floatContainer1" className="col-md-3 float-container">
+                                                <label>Arrive</label>
+                                                <input id="shadownone" value = {email.arrivalDate} name="adate" readOnly type="text"/>
+                                            </div>
+                                            <div id="floatContainer1" className = "col-md-3 float-container" style = {{marginLeft: "10px"}}>
+                                                <label>Depart</label>
+                                                <input id="shadownone" value = {email.departDate} name="ddate" readOnly type="text"/>
+                                            </div>
+                                            <div id="floatContainer1" className="col-md-3 float-container" style = {{marginLeft: "10px", maxWidth: "180px"}}>
+                                                <label>No. of Guests</label>
+                                                <input id="shadownone" value = {email.noOfGuests} name="guests" readOnly type="text"/>
                                             </div>
                                         </div>
                                         <div className="row">
-                                            <div className="col-md-3"  style = {{marginLeft: "8%"}}>
-                                                <div className="form-group card" style = {{ backgroundColor: "#f6f7f8", height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
-                                                    <small style = {{marginLeft : "5px", fontSize : "15px" , marginRight : "5px"}}>Arrive</small>
-                                                    <input type = 'text' value ={email.Arrivaldate} style = {{backgroundColor: "#f6f7f8", border : "none", marginTop : "16px"}}  readOnly/>
-                                                </div>
+                                            <div id="floatContainer1" className="float-container">
+                                                <label>Customer Name</label>
+                                                <input id="shadownone" value ={email.sender} readOnly/>
                                             </div>
-                                            <div className="col-md-3" style = {{marginLeft: "13px"}}>
-                                                <div className="form-group card" style = {{backgroundColor: "#f6f7f8", height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
-                                                    <small style = {{marginLeft : "5px", fontSize : "15px" , marginRight : "5px"}}>Depart</small>
-                                                    <input type = 'text' value ={email.Departdate}  style = {{ marginLeft : "25px", backgroundColor: "#f6f7f8", border : "none", marginTop : "16px"}}  readOnly/>
-                                                </div>
+                                            <div id="floatContainer1" className="float-container">
+                                                <label>Email Address</label>
+                                                <input id="shadownone" value = {email.senderEmailAddress} name="email" readOnly type="text"/>
                                             </div>
-                                            <div className="col-md-3" style = {{marginLeft: "13px"}}>
-                                                <div className="form-group card" style = {{backgroundColor: "#f6f7f8", width : "180px", height: "60px", fontFamily: "Lato,Roboto,Arial,Helvetica Neue,Helvetica,sans-serif"}}>
-                                                    <small style = {{marginLeft : "5px", fontSize : "15px" , marginRight : "5px"}}>Guests</small>
-                                                    <input type = 'text'  value ={email.Guests}  style = {{ marginLeft : "25px", backgroundColor: "#f6f7f8", border : "none", marginTop : "16px"}}  readOnly/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div id="floatContainer5" className="float-container">
-                                                <label htmlFor="floatField5">Customer Name</label>
-                                                <input type = 'text' value ={email.Sender} readOnly/>
-                                            </div>
-                                            <div className="float-container1">
-                                                <textarea id="message" readOnly value = {email.MailContent} name="aboutme" cols="40" rows="4" placeholder="Message from Customer" className="form-control"></textarea>
-                                            </div>
-                                            <div className="float-container1">
-                                                <textarea id="message" value = {mailreply} onChange = {handlemessage} cols="40" rows="10" placeholder="Message to Customer" className="form-control"></textarea>
-                                            </div>
+                                            <textarea id="message" style={{width: "600px", marginLeft : "80px", }} value = {mailReply} onChange = {changeMessageHandler} cols="40" rows="5" placeholder="Message to Customer" className="form-control"></textarea>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="actions">
-                                    <button
-                                        className="btn btn-primary btn2"
-                                        style = {{ height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", borderRadius: 30}} 
-                                        data-effect="ripple" 
-                                        type="button" 
-                                        tabIndex="5" 
-                                        data-loading-animation="true"
-                                        onClick={() => handlesend(email, mailreply)}>
+                                    <button className="btn btn-primary" onClick={() => sendReply(email, mailReply)} style = {{ height: "60px", borderColor: "#ffffff", backgroundColor:"#0067db", width: "120px", borderRadius: 25}} data-effect="ripple" type="button" tabIndex="5" data-loading-animation="true">
                                         Send
                                     </button>
                                 </div>
@@ -543,27 +464,76 @@ const EmailDetails = ({ email, open , mailreply, openModal, closeModal, handleme
                         </Popup>
                     </div>
                     <div className="email-details__info">
-                        <h5>{email.Sender} {"<"}{email.SenderEmailAddress}{">"}</h5>
-                        <span className="pull-right">{prettyDate(email.TimeReceived)}</span>
+                        <h5>{email.sender} {"<"}{email.senderEmailAddress}{">"}</h5>
+                        <span className="pull-right">{prettyDate(email.timeReceived)}</span>
                     </div>
                     <div className="email-details__info">
-                        <strong>PropertyID #{email.PropertyID}&nbsp;{email.PropertyHeader}</strong>
+                        <strong>Property Headline: {email.propertyHeadline}</strong>
                     </div>
                     <div className="email-details__info">
-                        <strong>{email.City}</strong>
+                        <strong>In {email.city}</strong>
                     </div>
                     <div className="email-details__info">
-                        <strong>Check In&nbsp;&nbsp;: {email.Arrivaldate}</strong>
+                        <strong>Check In&nbsp;&nbsp;: {email.arrivalDate}</strong>
                     </div>
                     <div className="email-details__info">
-                        <strong>Check Out : {email.Departdate}</strong>
+                        <strong>Check Out : {email.departDate}</strong>
                     </div>
                     <div className="email-details__info">
-                        <strong>Guests : {email.Guests}</strong>
+                        <strong>Guests : {email.noOfGuests}</strong>
                     </div>
                 </div>
                 <div className="email-details__message" style = {{whiteSpace : "pre-wrap"}}>
-                    <h6 style = {{color :"#5e6d77", fontSize : "18px"}}>{email.MailContent}</h6>
+                    <h6 style = {{color :"#5e6d77", fontSize : "18px"}}>{email.mailContent}</h6>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+const SentEmailDetails = ({email}) =>{
+    if(!email) {
+        return (
+            <div className="email-details__wrapper">
+                <div className="empty-container">
+                    <div className="empty-container__content">
+                    {/* To not display the expanded email details div in case of no emails */}
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div className="email-details__wrapper col-md-8" style={{background: "rgba(0, 123, 255, 0.09)",}}>
+            <div className="email-details__container">
+                <div className="email-details__header">
+                    <div className="email-details__info">
+                        <h5>{email.sender} {"<"}{email.senderEmailAddress}{">"}</h5>
+                        <span className="pull-right">{prettyDate(email.timeReceived)}</span>
+                    </div>
+                    <div className="email-details__info">
+                        <strong>{email.propertyHeadline}</strong>
+                    </div>
+                    <div className="email-details__info">
+                        <strong>{email.city}</strong>
+                    </div>
+                    <div className="email-details__info">
+                        <strong>Check In&nbsp;&nbsp;: {email.arrivalDate}</strong>
+                    </div>
+                    <div className="email-details__info">
+                        <strong>Check Out : {email.departDate}</strong>
+                    </div>
+                    <div className="email-details__info">
+                        <strong>Guests : {email.noOfGuests}</strong>
+                    </div>
+                    <div className="email-details__buttons">
+                        <div className="email-details__mark">
+                        </div>
+                    </div>
+                </div>
+                <div className="email-details__message" style = {{whiteSpace : "pre-wrap"}}>
+                    <h6 style = {{color :"#5e6d77", fontSize : "18px"}}>{email.mailContent}</h6>
                 </div>
             </div>
         </div>
@@ -580,4 +550,4 @@ function mapStateToProps(state) {
   
   export default withRouter(reduxForm({
     form: "InboxForm"
-  })(connect(mapStateToProps, {getemails, replytoemail, getsentemails})(Inbox)));
+  })(connect(mapStateToProps, {getemails, sendmail, getsentemails})(Inbox)));

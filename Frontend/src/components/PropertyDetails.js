@@ -41,7 +41,7 @@ class PropertyDetails extends Component {
           alert: null,
           booked : false,
           open: false,
-          mailcontent :"",
+          mailContent :"",
         };
         this.logout = this.logout.bind(this);
         this.fromDateChangeHandler = this.fromDateChangeHandler.bind(this);
@@ -220,7 +220,7 @@ class PropertyDetails extends Component {
 
     messageChangeHandler = (event) => {
         this.setState ({
-            mailcontent : event.target.value
+            mailContent : event.target.value
         })
     }
 
@@ -231,17 +231,17 @@ class PropertyDetails extends Component {
             if (this.state.adate && this.state.ddate && this.state.pguests && this.state.isTravelerLoggedIn) {
 
                 var data = {
-                    sendername : cookie.load('cookie3') + ' ' + cookie.load('cookie4'),
-                    senderemail : cookie.load('cookie2'),
+                    sender : cookie.load('cookie3') + ' ' + cookie.load('cookie4'),
+                    senderEmailAddress : cookie.load('cookie2'),
                     receiver : this.state.propertyDetails.listedBy,
-                    mailcontent : this.state.mailcontent,
-                    propertyid : this.state.propertyDetails._id,
-                    propertylocated : this.state.propertyDetails.city,
-                    propertyheader : this.state.propertyDetails.headline,
-                    checkin : this.state.bookingFromDate,
-                    checkout : this.state.bookingToDate,
-                    guests : this.state.guests,
-                    reply : false
+                    mailContent : this.state.mailContent,
+                    propertyID : this.state.propertyDetails._id,
+                    city : this.state.propertyDetails.city,
+                    propertyHeadline : this.state.propertyDetails.headline,
+                    arrivalDate : this.state.bookingFromDate,
+                    departDate : this.state.bookingToDate,
+                    noOfGuests : this.state.guests,
+                    replied : false
                 }
     
                 console.log("send message")
@@ -270,8 +270,9 @@ class PropertyDetails extends Component {
 
         var start = moment(this.state.bookingFromDate, "YYYY-MM-DD");
         var end = moment(this.state.bookingToDate, "YYYY-MM-DD");
+        
         //Difference in number of days
-        var difference = (moment.duration(end.diff(start)).asDays());
+        var difference = end.diff(start, 'days');
         var price = difference * propertyDetails.baseRate;
 
         this.state.price = price;
@@ -516,29 +517,29 @@ class PropertyDetails extends Component {
                                                 <div className="content">
                                                     <div className="row">
                                                         <div id="floatContainer1" className="col-md-3 float-container">
-                                                            <label htmlFor="floatField4">Arrive</label>
+                                                            <label>Arrive</label>
                                                             <input id="shadownone" value = {this.state.bookingFromDate} name="adate" readOnly type="text"/>
                                                         </div>
                                                         <div id="floatContainer1" className = "col-md-3 float-container" style = {{marginLeft: "10px"}}>
-                                                            <label htmlFor="floatField5">Depart</label>
+                                                            <label>Depart</label>
                                                             <input id="shadownone" value = {this.state.bookingToDate} name="ddate" readOnly type="text"/>
                                                         </div>
                                                         <div id="floatContainer1" className="col-md-3 float-container" style = {{marginLeft: "10px", maxWidth: "180px"}}>
-                                                            <label htmlFor="floatField6">No. of Guests</label>
+                                                            <label>No. of Guests</label>
                                                             <input id="shadownone" value = {this.state.guests} name="guests" readOnly type="text"/>
                                                         </div>
                                                     </div>
                                                     <div className="row">
                                                         <div id="floatContainer1" className="float-container">
-                                                            <label htmlFor="floatField1">First Name</label>
+                                                            <label>First Name</label>
                                                             <input id="shadownone" value = {cookie.load('cookie3')} name="firstname"readOnly type="text"/>
                                                         </div>
                                                         <div id="floatContainer1" className="float-container">
-                                                            <label htmlFor="floatField2">Last Name</label>
+                                                            <label>Last Name</label>
                                                             <input id="shadownone" value = {cookie.load('cookie4')} name="lastname"  readOnly type="text"/>
                                                         </div>
                                                         <div id="floatContainer1" className="float-container">
-                                                            <label htmlFor="floatField3">Email Address</label>
+                                                            <label>Email Address</label>
                                                             <input id="shadownone" value = {cookie.load('cookie2')} name="email" readOnly type="text"/>
                                                         </div>
                                                         <textarea id="message"  style={{width: "600px", marginLeft : "80px", }} onChange = {this.messageChangeHandler} cols="40" rows="5" placeholder="Message to Owner" className="form-control"></textarea>

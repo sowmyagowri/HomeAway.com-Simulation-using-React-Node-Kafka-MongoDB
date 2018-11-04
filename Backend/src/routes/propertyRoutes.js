@@ -61,7 +61,7 @@ router.route('/owner/listproperty').post(upload.array('uploadedPhoto',5), requir
   }
 
   console.log(userData.image1);
-  kafka.make_request('property_topic',{"path":"listproperty", "userData": userData}, function(error){
+  kafka.make_request('property_topics',{"path":"listproperty", "userData": userData}, function(error){
     if (error) {
       console.log(error);
       console.log("unable to insert into database");
@@ -76,7 +76,7 @@ router.route('/owner/listproperty').post(upload.array('uploadedPhoto',5), requir
 // Search Property
 router.route('/property/search').post(function (req, res) {
   console.log(req.body)
-  kafka.make_request('property_topic',{"path":"propertysearch", "body": req.body}, function(error,result){
+  kafka.make_request('property_topics',{"path":"propertysearch", "body": req.body}, function(error,result){
     if (error) {
       console.log(error);
       console.log("unable to search database");
@@ -92,13 +92,13 @@ router.route('/property/search').post(function (req, res) {
 // Search Property by id to fetch property details
 router.route('/property/:id').get(function (req, res) {
   console.log(req.params.id);
-  kafka.make_request('property_topic',{"path":"propertysearchbyid", "id": req.params.id}, function(error,result){
+  kafka.make_request('property_topics',{"path":"propertysearchbyid", "id": req.params.id}, function(error,result){
     if (error) {
       console.log(error);
       console.log("Property not found");
       res.status(400).json({responseMessage: 'Property not found'});
     } else {
-      console.log(JSON.stringify(result.result));
+      //console.log(JSON.stringify(result.result));
       res.writeHead(200, {'content-type':'application/json'});
       res.end(JSON.stringify(result.result));
       console.log("Property Details Found");
@@ -129,14 +129,14 @@ router.route('/owner/propertylistings').post(requireAuth, function (req, res) {
   console.log("In Owner property Listings Route");
   console.log("req.body:", req.body);
   
-  kafka.make_request('property_topic',{"path":"propertylistings", "body": req.body}, function(error,result){
+  kafka.make_request('property_topics',{"path":"propertylistings", "body": req.body}, function(error,result){
     if (error) {
       console.log(error);
       console.log("Property not found");
       res.status(400).json({responseMessage: 'Property not found'});
     } else {
         console.log("Property Found");
-        console.log(result.result);
+        //console.log(result.result);
         res.writeHead(200, {'content-type':'application/json'});
         res.end(JSON.stringify(result.result));
     }
@@ -175,7 +175,7 @@ router.route('/traveller/triplistings').post(requireAuth, function (req, res) {
   console.log("In Traveller Trip Listings Route");
   console.log(req.body);
 
-  kafka.make_request('property_topic',{"path":"triplistings", "body": req.body}, function(error,result){
+  kafka.make_request('property_topics',{"path":"triplistings", "body": req.body}, function(error,result){
     if (error) {
       console.log(error);
       console.log("Trips not found");

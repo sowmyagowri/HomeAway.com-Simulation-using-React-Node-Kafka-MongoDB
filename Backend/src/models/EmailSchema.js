@@ -1,42 +1,43 @@
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
 //schema
-var EmailSchema = new mongoose.Schema({
-    Sender : {
-        type : String, required : true
+EmailSchema = new Schema({
+    sender : {
+        type : String, 
     },
-    SenderEmailAddress : {
-        type : String, required : true
+    senderEmailAddress : {
+        type : String, 
     },
-    Receiver : {
-        type : String, required : true
+    receiver : {
+        type : String,
     },
-    TimeReceived : {
-        type : String, required : true
+    timeReceived : {
+        type : String,
     },
-    MailContent : {
-        type : String, required : true
+    mailContent : {
+        type : String,
     },
-    PropertyID : {
-        type : String, required : false
+    propertyID : {
+        type : String,
     },
-    City : {
-        type : String, required : false
+    city : {
+        type : String,
     },
-    PropertyHeader : {
-        type : String, required : false
+    propertyHeadline : {
+        type : String,
     },
-    Arrivaldate : {
-        type : String, required : false
+    arrivalDate : {
+        type : String, 
     },
-    Departdate : {
-        type : String, required : false
+    departDate : {
+        type : String, 
     },
-    Guests: {
-        type : String, required : false
+    noOfGuests: {
+        type : String
     }, 
-    Replied: {
-        type : Boolean, required : true
+    replied: {
+        type : Boolean
     }
 })
 

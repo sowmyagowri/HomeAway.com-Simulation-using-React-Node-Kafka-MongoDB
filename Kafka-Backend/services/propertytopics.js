@@ -165,7 +165,7 @@ function propertysearch(msg, callback){
                                                 callback(error, "Property not found");
                                             } else {
                                                 console.log("Property Found");
-                                                console.log(result);
+                                                //console.log(result);
                                                 callback(null, {status: 200, result: result});
                                             }
                                         })
@@ -185,7 +185,7 @@ function propertysearchbyid(msg, callback){
             console.log("Property not found");
             callback(error, "Property not found");
         } else {
-            console.log("Property Added");
+            console.log("Property Found");
             callback(null, {status: 200, result: result});
         }
     })

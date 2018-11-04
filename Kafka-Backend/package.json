@@ -2,7 +2,7 @@
   "name": "Kafka-Backend",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
     "test": "mocha",
     "start": "nodemon server.js"

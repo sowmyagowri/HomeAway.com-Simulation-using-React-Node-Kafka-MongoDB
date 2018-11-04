@@ -16,7 +16,7 @@ router.route('/traveller/login').post(function (req, res) {
   var lowercaseemail = email.toLowerCase();
   var trimemail = lowercaseemail.trim();
   
-  kafka.make_request('login_topic',{"path":"travellerlogin", "trimemail": trimemail, "password":req.body.password}, function(err,result){
+  kafka.make_request('login_topics',{"path":"travellerlogin", "trimemail": trimemail, "password":req.body.password}, function(err,result){
     if(err){
       res.status(400).json({responseMessage: 'unable to read the users database'});
     }
@@ -52,7 +52,7 @@ router.route('/owner/login').post(function (req, res) {
   var lowercaseemail = email.toLowerCase();
   var trimemail = lowercaseemail.trim();
   
-  kafka.make_request('login_topic',{"path":"ownerlogin", "trimemail": trimemail, "password":req.body.password}, function(err,result){
+  kafka.make_request('login_topics',{"path":"ownerlogin", "trimemail": trimemail, "password": req.body.password}, function(err,result){
     if (err) {
         res.status(400).json({responseMessage: 'Database Error'});
     }
@@ -92,7 +92,7 @@ router.route('/traveller/signup').post(function (req, res) {
   email = req.body.email.toLowerCase();
   trimemail = email.trim();
   
-  kafka.make_request('login_topic',{"path":"travellersignup", "trimemail": trimemail, "body": req.body}, function(err,result){
+  kafka.make_request('login_topics',{"path":"travellersignup", "trimemail": trimemail, "body": req.body}, function(err,result){
     if (err) {
       res.status(400).json({responseMessage: 'Database Error'});
     }
@@ -124,7 +124,7 @@ router.route('/owner/signup').post(function (req, res) {
   var today = new Date();
   var year = today.getFullYear();
   
-  kafka.make_request('login_topic',{"path":"ownersignup", "trimemail": trimemail, "body": req.body}, function(err,result){
+  kafka.make_request('login_topics',{"path":"ownersignup", "trimemail": trimemail, "body": req.body}, function(err,result){
     if (err){
         console.log(err);
         console.log("Database Error");
@@ -164,7 +164,7 @@ router.route('/owner/signup').post(function (req, res) {
 router.route('/profile').post(requireAuth, function (req, res) {
   console.log("Inside Profile fetch");
   var input_email = req.body.email;
-  kafka.make_request('login_topic',{"path":"profilefetch", "input_email": input_email}, function(err,result){
+  kafka.make_request('login_topics',{"path":"profilefetch", "input_email": input_email}, function(err,result){
     if (err){
       console.log(err);
       res.status(400).json({responseMessage: 'User not found'});
@@ -198,7 +198,7 @@ router.route('/profilesave').post(requireAuth, function (req, res) {
   }
 
   console.log(userData);
-  kafka.make_request('login_topic',{"path": "profilesave", "input_email": trimemail, "userData": userData}, function(error,result){
+  kafka.make_request('login_topics',{"path": "profilesave", "input_email": trimemail, "userData": userData}, function(error,result){
     if (error) {
       console.log(error);
       console.log("unable to update database");

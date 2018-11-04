@@ -257,7 +257,7 @@ class Profile extends Component{
                 (
                     <div id="conttab" className="container">
                         <ul id="ulinktab">
-                            <li id="ulinktab" className="one"><a id="linktab" > <i className="fas fa-envelope"></i> Inbox</a></li>
+                            <li id="ulinktab" className="one"><a id="linktab" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a></li>
                             <li id="ulinktab" className="two"><a id="linktab" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a></li>
                             <li id="ulinktab" className="three"><a id="linktab" href="/Profile"> <i className="fas fa-user"></i> My Profile</a></li>
                             <hr id="hrtab" />
@@ -268,7 +268,7 @@ class Profile extends Component{
                 (
                     <div id="conttab" className="container">
                         <ul id="ulinktab">
-                            <li id="ulinktab" className="one"><a id="linktab" > <i className="fas fa-envelope"></i> Inbox</a></li>
+                            <li id="ulinktab" className="one"><a id="linktab" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a></li>
                             <li id="ulinktab" className="two"><a id="linktab" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a></li>
                             <li id="ulinktab" className="three"><a id="linktab" href="/Profile"> <i className="fas fa-user"></i> My Profile</a></li>
                             <li id="ulinktab" className="four"><a id="linktab" href="/owner/propertypost"> <i className="fas fa-building"></i> Post Property</a></li>
