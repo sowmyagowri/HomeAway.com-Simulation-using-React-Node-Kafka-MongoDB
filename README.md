@@ -14,6 +14,7 @@
 
   ### Back end 
     - NodeJS
+    - Kafka
 
   ### Data Storage
     - MySQL
