@@ -12,7 +12,7 @@ export function propertypost(formdata, tokenFromStorage) {
     }
   };
   axios.defaults.withCredentials = true;
-  const response =  axios.post('http://localhost:3001/homeaway/owner/listproperty', formdata, config)
+  const response =  axios.post('ec2-13-57-49-252.us-west-1.compute.amazonaws.com:3001/homeaway/owner/listproperty', formdata, config)
   console.log("Response", response);
   return {
     type: userConstants.PROPERTY_POST,
@@ -31,7 +31,7 @@ export function propertylisting(formdata, tokenFromStorage) {
     }
   };
   axios.defaults.withCredentials = true;
-  const response =  axios.post('http://localhost:3001/homeaway/owner/propertylistings', formdata, config)
+  const response =  axios.post('http://ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/owner/propertylistings', formdata, config)
   console.log("Response", response);
   return {
     type: userConstants.PROPERTY_LIST,
@@ -50,7 +50,7 @@ export function propertysearch(formdata, tokenFromStorage) {
     }
   };
   axios.defaults.withCredentials = true;
-  const response =  axios.post('http://localhost:3001/homeaway/property/search', formdata, config)
+  const response =  axios.post('http://ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/property/search', formdata, config)
   console.log("Response", response);
   return {
     type: userConstants.PROPERTY_SEARCH,
@@ -70,7 +70,7 @@ export function propertydetails(propertyID, tokenFromStorage) {
   };
   axios.defaults.withCredentials = true;
 
-  var url = "http://localhost:3001/homeaway/property/" + propertyID;   
+  var url = "http://ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/property/" + propertyID;   
   const response =  axios.get(url, config)
   console.log("Response", response);
   return {
@@ -90,7 +90,7 @@ export function propertybook(formdata, tokenFromStorage) {
     }
   };
   axios.defaults.withCredentials = true;
-  const response =  axios.post('http://localhost:3001/homeaway/bookproperty', formdata, config)
+  const response =  axios.post('http://ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/bookproperty', formdata, config)
   console.log("Response", response);
   return {
     type: userConstants.PROPERTY_BOOK,
@@ -109,7 +109,7 @@ export function travellertrips(formdata, tokenFromStorage) {
     }
   };
   axios.defaults.withCredentials = true;
-  const response =  axios.post('http://localhost:3001/homeaway/traveller/triplistings', formdata, config)
+  const response =  axios.post('http://ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/traveller/triplistings', formdata, config)
   console.log("Response", response);
   return {
     type: userConstants.LIST_BOOKINGS,

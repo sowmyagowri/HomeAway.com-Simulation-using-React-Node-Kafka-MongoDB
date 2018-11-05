@@ -80,9 +80,10 @@ class PropertySearchResults extends Component {
     };
 
     logout = () => {
-        cookie.remove('cookie1', {path: '/'})
-        cookie.remove('cookie2', {path: '/'})
-        cookie.remove('cookie3', {path: '/'})
+        // cookie.remove('cookie1', {path: '/'})
+        // cookie.remove('cookie2', {path: '/'})
+        // cookie.remove('cookie3', {path: '/'})
+        sessionStorage.clear();
         console.log("All cookies removed!")
         window.location = "/"
     }
@@ -326,7 +327,7 @@ class PropertySearchResults extends Component {
     render(){
 
         console.log('cookie1');
-        if(cookie.load('cookie1') === 'travellercookie'){
+        if(sessionStorage.getItem('cookie1') === 'travellercookie'){
             this.state.isTravelerLoggedIn = true
         }
 
@@ -393,7 +394,7 @@ class PropertySearchResults extends Component {
                     (
                     <div>
                         <div className="btn btn-group" id="white" style = {{marginRight: "160px", width: "50px", }}>
-                            <button className="dropdown-toggle" style = {{color: "#0067db", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                            <button className="dropdown-toggle" style = {{color: "#0067db", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {sessionStorage.getItem('cookie3')}</button>
                             <div className="dropdown-menu">
                             <a className="dropdown-item" href="/Profile"> <i className="fas fa-envelope"></i> Inbox</a>
                             <a className="dropdown-item" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a>

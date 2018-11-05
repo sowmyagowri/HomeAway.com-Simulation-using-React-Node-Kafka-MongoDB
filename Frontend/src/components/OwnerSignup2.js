@@ -135,6 +135,16 @@ class OwnerSignup2 extends Component{
             this.props.ownersignup(data).then(response => {
 
                 if(response.payload.status === 200){
+
+                    //store JWT Token to browser session storage 
+                    //If you use localStorage instead of sessionStorage, then this will persist across tabs and new windows.
+                    //sessionStorage = persisted only in current tab
+                    sessionStorage.setItem('jwtToken', response.payload.data.token);
+                    sessionStorage.setItem('cookie1', response.payload.data.cookie1);
+                    sessionStorage.setItem('cookie2', response.payload.data.cookie2);
+                    sessionStorage.setItem('cookie3', response.payload.data.cookie3);
+                    sessionStorage.setItem('cookie4', response.payload.data.cookie4);
+                    
                     const getAlert = () => (
                         <SweetAlert 
                         success 
@@ -149,6 +159,12 @@ class OwnerSignup2 extends Component{
                         alert: getAlert(),
                     });
                 } else if(response.payload.status === 201){
+                    //sessionStorage = persisted only in current tab
+                    sessionStorage.setItem('jwtToken', response.payload.data.token);
+                    sessionStorage.setItem('cookie1', response.payload.data.cookie1);
+                    sessionStorage.setItem('cookie2', response.payload.data.cookie2);
+                    sessionStorage.setItem('cookie3', response.payload.data.cookie3);
+                    sessionStorage.setItem('cookie4', response.payload.data.cookie4);
                     const getAlert = () => (
                         <SweetAlert 
                         success 
@@ -176,7 +192,7 @@ class OwnerSignup2 extends Component{
         const { firstname, lastname, email, password, message } = {...this.state};
         //redirect based on successful login
         let redirectVar = null;
-        console.log("Cookie is", cookie.load('cookie1'))
+        console.log("Cookie is", sessionStorage.getItem('cookie1'))
 
         return(
             <div>

@@ -49,13 +49,17 @@ class TravellerLogin extends Component{
             }
             this.props.travellerlogin(data).then(response => {
                 if(response.payload.status === 200){
-                    this.setState({
-                        message: ""
-                    });
                     //store JWT Token to browser session storage 
                     //If you use localStorage instead of sessionStorage, then this will persist across tabs and new windows.
                     //sessionStorage = persisted only in current tab
                     sessionStorage.setItem('jwtToken', response.payload.data.token);
+                    sessionStorage.setItem('cookie1', response.payload.data.cookie1);
+                    sessionStorage.setItem('cookie2', response.payload.data.cookie2);
+                    sessionStorage.setItem('cookie3', response.payload.data.cookie3);
+                    sessionStorage.setItem('cookie4', response.payload.data.cookie4);
+                    this.setState({
+                        message: ""
+                    });
                 }
             }).catch (error => {
                 console.log("Error is", error);
@@ -71,8 +75,8 @@ class TravellerLogin extends Component{
         const { email, password, submitted, message } = this.state;
         //redirect based on successful login
         let redirectVar = null;
-        console.log("Cookie is", cookie.load('cookie1'));
-        if(cookie.load('cookie1') === 'travellercookie'){
+        console.log("Cookie is", sessionStorage.getItem('cookie1'));
+        if(sessionStorage.getItem('cookie1') === 'travellercookie'){
             redirectVar = <Redirect to= "/"/>
         }
         return(

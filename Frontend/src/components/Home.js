@@ -25,9 +25,10 @@ class Home extends Component {
   }
 
   logout = () => {
-    cookie.remove('cookie1', {path: '/'})
-    cookie.remove('cookie2', {path: '/'})
-    cookie.remove('cookie3', {path: '/'})
+    // cookie.remove('cookie1', {path: '/'})
+    // cookie.remove('cookie2', {path: '/'})
+    // cookie.remove('cookie3', {path: '/'})
+    sessionStorage.clear();
     console.log("All cookies removed!")
     window.location = "/"
   }
@@ -136,7 +137,7 @@ class Home extends Component {
   }
 
   render(){
-    if(cookie.load('cookie1')){
+    if(sessionStorage.getItem('cookie1')){
       this.state.isTravelerLoggedIn = true
     }
 
@@ -168,7 +169,7 @@ class Home extends Component {
                 (
                 <div>
                   <div id="white" className="btn btn-group" style = {{marginRight: "160px", width: "50px", }}>
-                    <button className="dropdown-toggle" style = {{color: "white", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                    <button className="dropdown-toggle" style = {{color: "white", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {sessionStorage.getItem('cookie3') }</button>
                     <div className="dropdown-menu">
                       <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
                       <a className="dropdown-item" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a>

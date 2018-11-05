@@ -20,7 +20,7 @@ class OwnerPropertyPost extends Component{
   constructor(props){
     super(props);
       this.state =  {
-      name: cookie.load('cookie3'),
+      name: sessionStorage.getItem('cookie3'),
       startDate: new Date(),
       endDate: new Date(),
       sleeps : 1,
@@ -103,9 +103,10 @@ startDateChangeHandler = (e) => this.setState ({ startDate:  e.target.value })
 endDateChangeHandler = (e) => this.setState ({ endDate:  e.target.value })
 
 logout = () => {
-  cookie.remove('cookie1', {path: '/'})
-  cookie.remove('cookie2', {path: '/'})
-  cookie.remove('cookie3', {path: '/'})
+  // cookie.remove('cookie1', {path: '/'})
+  // cookie.remove('cookie2', {path: '/'})
+  // cookie.remove('cookie3', {path: '/'})
+  sessionStorage.clear();
   console.log("All cookies removed!")
   window.location = "/"
 }
@@ -233,7 +234,7 @@ addProperty = (e) => {
   console.log("In Add Property");
   console.log(this.state.startDate);
   var data = {
-    listedBy: cookie.load('cookie2'),
+    listedBy: sessionStorage.getItem('cookie2'),
     startDate: this.state.startDate,
     endDate: this.state.endDate,
     streetAddress: this.state.streetAddress,
@@ -283,8 +284,8 @@ addProperty = (e) => {
 render(){
 
   let redirectVar = null;
-  console.log(cookie.load('cookie1'))
-  if(cookie.load('cookie1') !== 'ownercookie'){
+  console.log(sessionStorage.getItem('cookie1'))
+  if(sessionStorage.getItem('cookie1') !== 'ownercookie'){
     redirectVar = <Redirect to = "/owner/login"/>
   }
   if(this.state.posted){

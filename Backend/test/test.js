@@ -8,8 +8,7 @@ var testInput_firstname = "Mocha";
 var testInput_lastname =  "Test";
 var testInput_email = "mocha.testemail@gmail.com";
 var testInput_password = "test";
-var propertyid = 43;
-var bookingid = 10;
+var propertyid = "5bcd5ab5a79861546c5a0fe8";
 
 describe('HomeAway Test Cases:', () => {
 
@@ -27,21 +26,8 @@ describe('HomeAway Test Cases:', () => {
         });
     })
 
-    // Get Booking details
-    it("Test Case 2 - Details of an existing booking Get", (done) => {
-        chai.request('http://localhost:3001/homeaway')
-        .get(`/bookings/${bookingid}`)
-        .end((err, res) => {
-            expect(err).to.be.null;
-            res.body.should.be.a('array');
-            res.status.should.be.equal(200);
-            expect(res.body[0].propertyID).to.equal(45);
-        done();
-        });
-    })
-
     // SignUp Traveler
-    it("Test Case 3 - Traveler SignUp Post", (done) => { 
+    it("Test Case 2 - Traveler SignUp Post", (done) => { 
 
         const travelerSignupData = {
             "firstname" : testInput_firstname, 
@@ -62,7 +48,7 @@ describe('HomeAway Test Cases:', () => {
     })
 
     // Login as Traveler
-    it("Test Case 4 - Traveler Login Post", (done) => {
+    it("Test Case 3 - Traveler Login Post", (done) => {
 
         let travelerLoginData = {
             "email": testInput_email,
@@ -81,7 +67,7 @@ describe('HomeAway Test Cases:', () => {
     })
 
     // SignUp Owner
-    it("Test Case 5 - Owner SignUp Post", (done) => { 
+    it("Test Case 4 - Owner SignUp Post", (done) => { 
 
         let ownerSignupData = {
             "firstname" : testInput_firstname, 
@@ -102,7 +88,7 @@ describe('HomeAway Test Cases:', () => {
     })
 
     // Login as Owner
-    it("Test Case 6 - Owner Login Post", (done) => {
+    it("Test Case 5 - Owner Login Post", (done) => {
 
         let ownerLoginData = {
             "email": testInput_email,
@@ -120,12 +106,12 @@ describe('HomeAway Test Cases:', () => {
     })
 
     // Search for Property listings
-    it("Test Case 7 - Search for Property listings Post", (done) => {
+    it("Test Case 6 - Search for Property listings Post", (done) => {
 
         let propertySearchdata = {
             city : "sunnyvale",
-            startDate : "2018-10-30",
-            endDate : "2018-10-31",
+            startDate : "2018-10-23",
+            endDate : "2018-12-31",
             noOfGuests: "3"
         }
         chai.request('http://localhost:3001/homeaway')
@@ -136,23 +122,6 @@ describe('HomeAway Test Cases:', () => {
             res.status.should.be.equal(200);
             res.should.be.json;
             expect(res.body.length).to.equal(3)
-        done();
-        });
-    })
-
-    // Get Profile details
-    it("Test Case 8 - Get Profile Details Post", (done) => {
-        chai.request('http://localhost:3001/homeaway')
-        .post('/profile')
-        .send({"email": testInput_email})
-        .end((err, res) => {
-            expect(err).to.be.null;
-            res.status.should.be.equal(200);
-            res.should.be.json;
-            var obj = JSON.parse(res.text)
-            expect(obj[0].firstname).to.equal("Mocha")
-            expect(obj[0].lastname).to.equal("Test")
-            expect(obj[0].created).to.equal("2018")
         done();
         });
     })

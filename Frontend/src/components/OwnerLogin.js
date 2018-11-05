@@ -57,6 +57,10 @@ class OwnerLogin extends Component{
                     //If you use localStorage instead of sessionStorage, then this will persist across tabs and new windows.
                     //sessionStorage = persisted only in current tab
                     sessionStorage.setItem('jwtToken', response.payload.data.token);
+                    sessionStorage.setItem('cookie1', response.payload.data.cookie1);
+                    sessionStorage.setItem('cookie2', response.payload.data.cookie2);
+                    sessionStorage.setItem('cookie3', response.payload.data.cookie3);
+                    sessionStorage.setItem('cookie4', response.payload.data.cookie4);
                 }
             }).catch (error => {
                 console.log("Error is", error);
@@ -72,8 +76,8 @@ class OwnerLogin extends Component{
         const { email, password, submitted, message } = this.state;
         //redirect based on successful login
         let redirectVar = null;
-        console.log("Cookie is", cookie.load('cookie1'));
-        if(cookie.load('cookie1') === 'ownercookie'){
+        console.log("Cookie is", sessionStorage.getItem('cookie1'));
+        if(sessionStorage.getItem('cookie1') === 'ownercookie'){
             redirectVar = <Redirect to= "/owner/mylistings"/>
         }
         return(

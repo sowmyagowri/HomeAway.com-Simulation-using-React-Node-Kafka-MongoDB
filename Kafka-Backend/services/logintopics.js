@@ -145,6 +145,8 @@ function ownersignup(msg, callback){
                     })
                 }
             } else {
+                var today = new Date();
+                var year = today.getFullYear();
                 crypt.createHash(msg.body.password, function (response) {
                     encryptedPassword = response;
                 

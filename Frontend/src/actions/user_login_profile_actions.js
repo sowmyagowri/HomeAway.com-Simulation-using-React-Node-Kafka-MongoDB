@@ -12,7 +12,7 @@ export function travellerlogin(data, tokenFromStorage) {
     }
   };
   axios.defaults.withCredentials = true;
-  const response =  axios.post('http://localhost:3001/homeaway/traveller/login',data, config);
+  const response =  axios.post('ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/traveller/login',data, config);
   console.log("Response", response);
   return {
     type: userConstants.TRAVELLER_LOGIN,
@@ -25,7 +25,7 @@ export function travellersignup(data) {
   console.log("inside traveller signup action")
   console.log(data)
   axios.defaults.withCredentials = true;
-  const response =  axios.post('http://localhost:3001/homeaway/traveller/signup',data);
+  const response =  axios.post('http://ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/traveller/signup',data);
   console.log("Response", response);
   return {
     type: userConstants.TRAVELLER_SIGNUP,
@@ -44,7 +44,7 @@ export function ownerlogin(data, tokenFromStorage) {
     }
   };
   axios.defaults.withCredentials = true;
-  const response =  axios.post('http://localhost:3001/homeaway/owner/login',data, config);
+  const response =  axios.post('http://ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/owner/login',data, config);
   console.log("Response", response);
   return {
     type: userConstants.OWNER_LOGIN,
@@ -57,7 +57,7 @@ export function ownersignup(data) {
   console.log("inside owner signup action")
   console.log(data)
   axios.defaults.withCredentials = true;
-  const response =  axios.post('http://localhost:3001/homeaway/owner/signup',data);
+  const response =  axios.post('http://ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/owner/signup',data);
   console.log("Response", response);
   return {
     type: userConstants.OWNER_SIGNUP,
@@ -77,7 +77,7 @@ export function profilefetch(data, tokenFromStorage) {
   };
   axios.defaults.withCredentials = true;
   console.log("headers:", config);
-  const response =  axios.post('http://localhost:3001/homeaway/profile', data, config);
+  const response =  axios.post('http://ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/profile', data, config);
   console.log("Response", response);
   return {
     type: userConstants.PROFILE_FETCH,
@@ -95,7 +95,7 @@ export function profilesave(data, tokenFromStorage) {
     }
   };
   axios.defaults.withCredentials = true;
-  const response =  axios.post('http://localhost:3001/homeaway/profilesave', data, config);
+  const response =  axios.post('http://ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/profilesave', data, config);
   console.log("Response", response);
   return {
     type: userConstants.PROFILE_SAVE,

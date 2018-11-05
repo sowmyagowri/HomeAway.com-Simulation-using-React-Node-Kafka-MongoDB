@@ -71,17 +71,18 @@ class Inbox extends Component {
     }
 
     logout = () => {
-        cookie.remove('cookie1', {path: '/'})
-        cookie.remove('cookie2', {path: '/'})
-        cookie.remove('cookie3', {path: '/'})
+        // cookie.remove('cookie1', {path: '/'})
+        // cookie.remove('cookie2', {path: '/'})
+        // cookie.remove('cookie3', {path: '/'})
+        sessionStorage.clear();
         console.log("All cookies removed!")
         window.location = "/"
     }
 
     sendReply = (email, mailReply) => {
         var data = {
-            sender : cookie.load('cookie3') + ' ' + cookie.load('cookie4'),
-            senderEmailAddress : cookie.load('cookie2'),
+            sender : sessionStorage.getItem('cookie3') + ' ' + sessionStorage.getItem('cookie4'),
+            senderEmailAddress : sessionStorage.getItem('cookie2'),
             receiver : email.senderEmailAddress,
             _id : email._id,
             propertyID : email.propertyID,
@@ -99,7 +100,7 @@ class Inbox extends Component {
             console.log("Status Code for send mail: ",response.payload.status);
             if(response.payload.status === 200){
                 console.log("Message successfully sent")
-                var data = {emailID: cookie.load('cookie2')};
+                var data = {emailID: sessionStorage.getItem('cookie2')};
                 this.props.getsentemails(data, sessionStorage.getItem('jwtToken')).then(response => {
                     console.log("Status Code : ",response.payload.status);
                     if(response.payload.status === 200){
@@ -120,7 +121,7 @@ class Inbox extends Component {
     }
 
     componentDidMount() {
-        var emailfromcookie = cookie.load('cookie2');
+        var emailfromcookie = sessionStorage.getItem('cookie2');
         var data = {emailID: emailfromcookie};
             
         this.props.getemails(data, sessionStorage.getItem('jwtToken')).then(response => {
@@ -170,7 +171,7 @@ class Inbox extends Component {
         var travelername = null;
         /* redirect based on successful login */
         let redirectVar = null;
-        if(!cookie.load('cookie1')){
+        if(!sessionStorage.getItem('cookie1')){
             redirectVar = <Redirect to= "/"/> 
         } else {
             this.state.isTravelerLoggedIn = true;
@@ -192,11 +193,11 @@ class Inbox extends Component {
                     </div>
                 </Navbar.Header>
                 <div>
-                    {(cookie.load('cookie1') === 'travellercookie') 
+                    {(sessionStorage.getItem('cookie1') === 'travellercookie') 
                     ?
                     (
                     <div className="btn btn-group" id="white">
-                        <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                        <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {sessionStorage.getItem('cookie3')}</button>
                         <div className="dropdown-menu">
                             <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
                             <a className="dropdown-item" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a>
@@ -208,7 +209,7 @@ class Inbox extends Component {
                     :
                     (
                     <div className="btn btn-group" id="white">
-                        <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                        <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {sessionStorage.getItem('cookie3')}</button>
                         <div className="dropdown-menu">
                             <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
                             <a className="dropdown-item" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a>
@@ -225,7 +226,7 @@ class Inbox extends Component {
             <div className="container">
             </div>
             <div style={{backgroundColor: "white", borderLeftColor:"white",borderRightColor:"white",borderBottomColor: "#d6d7da", borderTopColor: "#d6d7da", borderStyle: "solid"}}>
-            {(cookie.load('cookie1') === 'travellercookie') 
+            {(sessionStorage.getItem('cookie1') === 'travellercookie') 
             ?
             (
                 <div id="conttab" className="container">

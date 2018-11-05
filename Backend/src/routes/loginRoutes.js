@@ -27,13 +27,9 @@ router.route('/traveller/login').post(function (req, res) {
       var token = jwt.sign({ id: result.user._id, email: result.user.email }, config.secret_key, {
         expiresIn: 7200 // expires in 2 hours
       });
-      res.cookie('cookie1',"travellercookie",{maxAge: 900000, httpOnly: false, path : '/'});
-      res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
-      res.cookie('cookie3',result.user.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-      res.cookie('cookie4',result.user.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
       req.session.user = result.user.email;
       //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
-      res.status(200).json({responseMessage: 'Login Successful', token: 'JWT ' + token});
+      res.status(200).json({responseMessage: 'Login Successful', token: 'JWT ' + token, cookie1: 'travellercookie', cookie2: trimemail, cookie3: result.user.firstname, cookie4: result.user.lastname});
       console.log("Traveller found in DB");
     } else if (result.status === 401){
       res.status(401).json({responseMessage: 'Authentication failed. Passwords did not match.'})
@@ -63,17 +59,9 @@ router.route('/owner/login').post(function (req, res) {
       var token = jwt.sign({ id: result.user._id, email: result.user.email }, config.secret_key, {
         expiresIn: 7200 // expires in 2 hours
       });
-      // Create token if the password matched and no error was thrown
-      var token = jwt.sign({ id: result.user._id, email: result.user.email }, config.secret_key, {
-        expiresIn: 7200 // expires in 2 hours
-      });
-      res.cookie('cookie1',"ownercookie",{maxAge: 900000, httpOnly: false, path : '/'});
-      res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
-      res.cookie('cookie3',result.user.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-      res.cookie('cookie4',result.user.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
       req.session.user = result.user.email;
       //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
-      res.status(200).json({responseMessage: 'Login Successful', token: 'JWT ' + token});
+      res.status(200).json({responseMessage: 'Login Successful', token: 'JWT ' + token, cookie1: 'ownercookie', cookie2: trimemail, cookie3: result.user.firstname, cookie4: result.user.lastname});
       console.log("Owner found in DB and token is", token);
     } else if (result.status === 401){
       res.status(401).json({responseMessage: 'Authentication failed. Passwords did not match.'})
@@ -103,12 +91,7 @@ router.route('/traveller/signup').post(function (req, res) {
       var token = jwt.sign({ id: result.user._id, email: result.user.email }, config.secret_key, {
         expiresIn: 7200 // expires in 2 hours
       });
-      res.cookie('cookie1',"travellercookie",{maxAge: 900000, httpOnly: false, path : '/'});
-      res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
-      res.cookie('cookie3',req.body.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-      res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
-      //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
-      res.status(200).json({responseMessage: 'User Added', token: 'JWT ' + token});
+      res.status(200).json({responseMessage: 'User Added', token: 'JWT ' + token, cookie1: 'travellercookie', cookie2: trimemail, cookie3: req.body.firstname, cookie4: req.body.lastname});
     } else if (result.status === 401){
       console.log("User already exists");
       res.status(401).json({responseMessage: 'User already exists'})
@@ -138,24 +121,14 @@ router.route('/owner/signup').post(function (req, res) {
           expiresIn: 7200 // expires in 2 hours
         });
         console.log("Owner profile added to traveller login");
-        res.cookie('cookie1',"ownercookie",{maxAge: 900000, httpOnly: false, path : '/'});
-        res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
-        res.cookie('cookie3',req.body.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-        res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
-        //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
-        res.status(201).json({responseMessage: 'Owner profile added to traveller login', token: 'JWT ' + token});
+        res.status(201).json({responseMessage: 'Owner profile added to traveller login', token: 'JWT ' + token, cookie1: 'ownercookie', cookie2: trimemail, cookie3: req.body.firstname, cookie4: req.body.lastname});
       } else if (result.status === 200) {
         console.log("Owner Added");
         // Create token if the password matched and no error was thrown
-        var token = jwt.sign({ id: user._id, email: user.email }, config.secret_key, {
+        var token = jwt.sign({ id: result.user._id, email: result.user.email }, config.secret_key, {
           expiresIn: 7200 // expires in 2 hours
         });
-        res.cookie('cookie1',"ownercookie",{maxAge: 900000, httpOnly: false, path : '/'});
-        res.cookie('cookie2',trimemail,{maxAge: 900000, httpOnly: false, path : '/'});
-        res.cookie('cookie3',req.body.firstname,{maxAge: 900000, httpOnly: false, path : '/'});
-        res.cookie('cookie4',req.body.lastname,{maxAge: 900000, httpOnly: false, path : '/'});
-        //It’s important the Auth header starts with JWT and a whitespace followed by the token, else passport-jwt will not extract it.
-        res.status(200).json({responseMessage: 'Owner Added', token: 'JWT ' + token});
+        res.status(200).json({responseMessage: 'Owner Added', token: 'JWT ' + token, cookie1: 'ownercookie', cookie2: trimemail, cookie3: req.body.firstname, cookie4: req.body.lastname});
       }
   })
 });

@@ -10,8 +10,8 @@ class TravellerSignup1 extends Component{
     render(){
         //redirect based on successful login
         let redirectVar = null;
-        console.log(cookie.load('cookie1'))
-        if(cookie.load('cookie1')){
+        console.log(sessionStorage.getItem('cookie1'))
+        if(sessionStorage.getItem('cookie1')){
             redirectVar = <Redirect to= "/"/>
         }
         return(

@@ -38,9 +38,10 @@ class OwnerPropertyListings extends Component {
     }
 
     logout = () => {
-        cookie.remove('cookie1', {path: '/'})
-        cookie.remove('cookie2', {path: '/'})
-        cookie.remove('cookie3', {path: '/'})
+        // cookie.remove('cookie1', {path: '/'})
+        // cookie.remove('cookie2', {path: '/'})
+        // cookie.remove('cookie3', {path: '/'})
+        sessionStorage.clear();
         console.log("All cookies removed!")
         window.location = "/"
     }
@@ -99,7 +100,7 @@ class OwnerPropertyListings extends Component {
 
         if(this.handleValidation()){
             const requestData = { 
-                listedBy : cookie.load('cookie2'),
+                listedBy : sessionStorage.getItem('cookie2'),
                 currentPage: 1, 
                 pageLimit: 0,
                 fromdate: this.state.fromdate,
@@ -157,7 +158,7 @@ class OwnerPropertyListings extends Component {
         console.log("page changes")
         const { currentPage, totalPages, pageLimit } = data;
         const requestDataPageChange = { 
-           listedBy : cookie.load('cookie2'),
+           listedBy : sessionStorage.getItem('cookie2'),
            currentPage: currentPage, 
            pageLimit: pageLimit,
            fromdate: this.state.fromdate,
@@ -195,7 +196,7 @@ class OwnerPropertyListings extends Component {
     componentWillMount(){
         
         const requestData = { 
-            listedBy : cookie.load('cookie2'),
+            listedBy : sessionStorage.getItem('cookie2'),
             currentPage: 1, 
             pageLimit: 0,
             fromdate: this.state.fromdate,
@@ -324,8 +325,8 @@ class OwnerPropertyListings extends Component {
         const totalListings = allListings.length;
         console.log("render", totalListings);
         let redirectVar = null;
-        console.log(cookie.load('cookie1'))
-        if(cookie.load('cookie1') !== 'ownercookie'){
+        console.log(sessionStorage.getItem('cookie1'))
+        if(sessionStorage.getItem('cookie1') !== 'ownercookie'){
           redirectVar = <Redirect to = "/owner/login"/>
         }
 
@@ -340,7 +341,7 @@ class OwnerPropertyListings extends Component {
                     </Navbar.Header>
                     <div>
                         <div id="white" className="btn btn-group">
-                            <button className="dropdown-toggle"  style = {{fontSize: "18px",backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                            <button className="dropdown-toggle"  style = {{fontSize: "18px",backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {sessionStorage.getItem('cookie3')}</button>
                             <div className="dropdown-menu">
                                 <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
                                 <a className="dropdown-item" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a>

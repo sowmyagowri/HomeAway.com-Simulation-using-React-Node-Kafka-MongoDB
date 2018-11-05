@@ -58,7 +58,7 @@ class PropertyDetails extends Component {
         console.log("In Property Details");
         var propertyID = this.state.propertyid;
 
-        if(cookie.load('cookie1') === 'travellercookie'){
+        if(sessionStorage.getItem('cookie1') === 'travellercookie'){
             this.setState({ isTravelerLoggedIn: true });
         }
 
@@ -123,9 +123,10 @@ class PropertyDetails extends Component {
     }
 
     logout = () => {
-        cookie.remove('cookie1', {path: '/'})
-        cookie.remove('cookie2', {path: '/'})
-        cookie.remove('cookie3', {path: '/'})
+        // cookie.remove('cookie1', {path: '/'})
+        // cookie.remove('cookie2', {path: '/'})
+        // cookie.remove('cookie3', {path: '/'})
+        sessionStorage.clear();
         console.log("All cookies removed!")
         window.location = "/"
     }
@@ -180,10 +181,10 @@ class PropertyDetails extends Component {
     
         var price = this.state.price
         price = price.toString();
-        var travellerName = cookie.load('cookie3') + cookie.load('cookie4');
+        var travellerName = sessionStorage.getItem('cookie3') + sessionStorage.getItem('cookie4');
         var data = {
             propertyid: this.state.propertyid,
-            bookedBy: cookie.load('cookie2'),
+            bookedBy: sessionStorage.getItem('cookie2'),
             travellerName: travellerName,
             bookedFrom : this.state.bookingFromDate,
             bookedTo : this.state.bookingToDate,
@@ -231,8 +232,8 @@ class PropertyDetails extends Component {
             if (this.state.adate && this.state.ddate && this.state.pguests && this.state.isTravelerLoggedIn) {
 
                 var data = {
-                    sender : cookie.load('cookie3') + ' ' + cookie.load('cookie4'),
-                    senderEmailAddress : cookie.load('cookie2'),
+                    sender : sessionStorage.getItem('cookie3') + ' ' + sessionStorage.getItem('cookie4'),
+                    senderEmailAddress : sessionStorage.getItem('cookie2'),
                     receiver : this.state.propertyDetails.listedBy,
                     mailContent : this.state.mailContent,
                     propertyID : this.state.propertyDetails._id,
@@ -308,7 +309,7 @@ class PropertyDetails extends Component {
                     (
                     <div>
                         <div className="btn btn-group" id="white" style = {{marginRight: "160px", width: "50px", }}>
-                            <button className="dropdown-toggle" style = {{color: "#0067db", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                            <button className="dropdown-toggle" style = {{color: "#0067db", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {sessionStorage.getItem('cookie3')}</button>
                             <div className="dropdown-menu">
                             <a className="dropdown-item" href="/Profile"> <i className="fas fa-envelope"></i> Inbox</a>
                             <a className="dropdown-item" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a>
@@ -532,15 +533,15 @@ class PropertyDetails extends Component {
                                                     <div className="row">
                                                         <div id="floatContainer1" className="float-container">
                                                             <label>First Name</label>
-                                                            <input id="shadownone" value = {cookie.load('cookie3')} name="firstname"readOnly type="text"/>
+                                                            <input id="shadownone" value = {sessionStorage.getItem('cookie3')} name="firstname"readOnly type="text"/>
                                                         </div>
                                                         <div id="floatContainer1" className="float-container">
                                                             <label>Last Name</label>
-                                                            <input id="shadownone" value = {cookie.load('cookie4')} name="lastname"  readOnly type="text"/>
+                                                            <input id="shadownone" value = {sessionStorage.getItem('cookie4')} name="lastname"  readOnly type="text"/>
                                                         </div>
                                                         <div id="floatContainer1" className="float-container">
                                                             <label>Email Address</label>
-                                                            <input id="shadownone" value = {cookie.load('cookie2')} name="email" readOnly type="text"/>
+                                                            <input id="shadownone" value = {sessionStorage.getItem('cookie2')} name="email" readOnly type="text"/>
                                                         </div>
                                                         <textarea id="message"  style={{width: "600px", marginLeft : "80px", }} onChange = {this.messageChangeHandler} cols="40" rows="5" placeholder="Message to Owner" className="form-control"></textarea>
                                                     </div>

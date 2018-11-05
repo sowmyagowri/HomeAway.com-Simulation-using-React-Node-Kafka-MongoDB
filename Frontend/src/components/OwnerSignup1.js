@@ -10,7 +10,7 @@ class OwnerSignup1 extends Component{
     render(){
         //redirect based on successful login
         let redirectVar = null;
-        if(cookie.load('cookie1') === 'ownercookie'){
+        if(sessionStorage.getItem('cookie1') === 'ownercookie'){
             redirectVar = <Redirect to= "/"/>
         }
         return(

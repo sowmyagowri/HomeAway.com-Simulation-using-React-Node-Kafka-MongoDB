@@ -12,7 +12,7 @@ export function sendmail(formdata, tokenFromStorage) {
     }
   };
   axios.defaults.withCredentials = true;
-  const response =  axios.post('http://localhost:3001/homeaway/sendmail', formdata, config)
+  const response =  axios.post('http://ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/sendmail', formdata, config)
   console.log("send mail Response", response);
   return {
     type: userConstants.SEND_MAIL,
@@ -31,7 +31,7 @@ export function getemails(formdata, tokenFromStorage) {
     }
   };
   axios.defaults.withCredentials = true;
-  const response =  axios.post('http://localhost:3001/homeaway/getemails', formdata, config)
+  const response =  axios.post('http://ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/getemails', formdata, config)
   console.log("Get emails Response", response);
   return {
     type: userConstants.GET_EMAILS,
@@ -50,7 +50,7 @@ export function getsentemails(formdata, tokenFromStorage) {
     }
   };
   axios.defaults.withCredentials = true;
-  const response =  axios.post('http://localhost:3001/homeaway/getsentemails', formdata, config)
+  const response =  axios.post('http://ec2-52-53-218-130.us-west-1.compute.amazonaws.com:3001/homeaway/getsentemails', formdata, config)
   console.log("Get sent emails Response", response);
   return {
     type: userConstants.GET_SENTEMAILS,

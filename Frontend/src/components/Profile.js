@@ -34,17 +34,18 @@ class Profile extends Component{
     }
 
     logout = () => {
-        cookie.remove('cookie1', {path: '/'})
-        cookie.remove('cookie2', {path: '/'})
-        cookie.remove('cookie3', {path: '/'})
+        // cookie.remove('cookie1', {path: '/'})
+        // cookie.remove('cookie2', {path: '/'})
+        // cookie.remove('cookie3', {path: '/'})
+        sessionStorage.clear();
         console.log("All cookies removed!")
         window.location = "/"
     }
 
     componentWillMount(){
         console.log("will mount");
-        if(cookie.load('cookie1')){
-            var input_email = cookie.load('cookie2');
+        if(sessionStorage.getItem('cookie1')){
+            var input_email = sessionStorage.getItem('cookie2');
             console.log(input_email);
             const data = { email : input_email }
             this.props.profilefetch(data, sessionStorage.getItem('jwtToken')).then(response => {
@@ -161,7 +162,7 @@ class Profile extends Component{
         event.preventDefault();
         if(this.handleValidation()){
             console.log("Profile Form data submitted");
-            var input_email = cookie.load('cookie2');
+            var input_email = sessionStorage.getItem('cookie2');
             console.log(input_email);
             const data = {
                 firstname : this.state.firstname,
@@ -199,8 +200,8 @@ class Profile extends Component{
 
         //redirect based on successful login
         let redirectVar = null;
-        console.log(cookie.load('cookie1'))
-        if(!cookie.load('cookie1')){
+        console.log(sessionStorage.getItem('cookie1'))
+        if(!sessionStorage.getItem('cookie1')){
             redirectVar = <Redirect to= "/"/>
         }
         
@@ -219,11 +220,11 @@ class Profile extends Component{
                         </div>
                     </Navbar.Header>
                     <div>
-                        {(cookie.load('cookie1') === 'travellercookie') 
+                        {(sessionStorage.getItem('cookie1') === 'travellercookie') 
                         ?
                         (
                         <div className="btn btn-group" id="white">
-                            <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                            <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {sessionStorage.getItem('cookie3')}</button>
                             <div className="dropdown-menu">
                                 <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
                                 <a className="dropdown-item" href="/traveller/mytrips"> <i className="fas fa-briefcase"></i> My Trips</a>
@@ -235,7 +236,7 @@ class Profile extends Component{
                         :
                         (
                         <div className="btn btn-group" id="white">
-                            <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {cookie.load('cookie3')}</button>
+                            <button className="dropdown-toggle"  style = {{fontSize: "18px", backgroundColor:"transparent", background:"transparent", borderColor:"transparent"}} type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Hello {sessionStorage.getItem('cookie3')}</button>
                             <div className="dropdown-menu">
                                 <a className="dropdown-item" href="/inbox"> <i className="fas fa-envelope"></i> Inbox</a>
                                 <a className="dropdown-item" href="/owner/mylistings"> <i className="fas fa-home"></i> My Listings</a>
@@ -252,7 +253,7 @@ class Profile extends Component{
                 <div className="container">
                 </div>
                 <div style={{backgroundColor: "white", borderLeftColor:"white",borderRightColor:"white",borderBottomColor: "#d6d7da", borderTopColor: "#d6d7da", borderStyle: "solid"}}>
-                {(cookie.load('cookie1') === 'travellercookie') 
+                {(sessionStorage.getItem('cookie1') === 'travellercookie') 
                 ?
                 (
                     <div id="conttab" className="container">
@@ -281,7 +282,7 @@ class Profile extends Component{
                 <div className="image "></div>
                 <div id = "profilehref" className="myprofilecontainer">
                     <div className="login-form">
-                        <h1>{cookie.load('cookie3')}</h1>
+                        <h1>{sessionStorage.getItem('cookie3')}</h1>
                         <h2><small>Member since  <input id = "year" ref = "createdyear" type="text" readOnly="readonly" /> </small></h2>
                         <h1><small>Profile Information</small></h1>
                         <br></br>
