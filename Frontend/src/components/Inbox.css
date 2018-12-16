@@ -1,0 +1,324 @@
+.one ~ #hrtab4 {
+  margin-left: 0%;
+}
+
+.two:hover ~ #hrtab4 {
+  margin-left: 25%;
+}
+
+.three:hover ~ #hrtab4 {
+  margin-left: 50%;
+}
+
+#hrtab4 {
+  height: .25rem;
+  width: 25%;
+  margin: 0;
+  background: blue;
+  border: none;
+  transition: .3s ease-in-out;
+}
+
+.lg-side {
+    width: 100%;
+    margin : 0;
+}
+
+.inbox-body {
+    padding: 20px;
+}
+
+
+ul.inbox-nav  {
+    display: inline-block;
+    width: 100%;
+    padding: 0;
+}
+
+.inbox-divider {
+    border-bottom: 1px solid #d5d8df;
+    margin-top : 40%;
+} 
+
+ul.inbox-nav li {
+    display: inline-block;
+    line-height: 45px;
+    width: 100%;
+}
+
+.rwt__tab{
+    font-size: 20px !important;
+    font-weight: 400;
+    cursor : pointer;
+}
+
+
+.rwt__tab:active, .rwt__tab:hover, .rwt__tab:link{
+    font-size: 20px !important;
+    font-weight: 400;
+    color: #0067db;
+    cursor : pointer;
+}
+
+ul.inbox-nav li a  {
+    line-height: 50px;
+    width: 100%;
+    display: inline-block;
+}
+
+ul.inbox-nav li a:hover, ul.inbox-nav li.active a, ul.inbox-nav li a:focus  {
+    color: #6a6a6a;
+}
+
+ul.inbox-nav li a i {
+    padding-right: 10px;
+    font-size: 20px;
+}
+
+ul.inbox-nav li a span.label {
+    margin-top: 20px;
+}
+
+ul.labels-info li h4 {
+    padding-left:15px;
+    padding-right:15px;
+    padding-top: 5px;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+ul.labels-info li  {
+    margin: 0;
+}
+
+ul.labels-info li a {
+    border-radius: 0;
+}
+
+ul.labels-info li a:hover, ul.labels-info li a:focus {
+    background: #d5d7de;
+}
+
+ul.labels-info li a i {
+    padding-right: 10px;
+}
+
+.inbox-head {
+    padding:20px;
+    color: black;
+    border-radius: 0 4px 0 0;
+    /* -webkit-border-radius: 0 4px 0 0; */
+    min-height: 80px;
+}
+
+.inbox-head  h3 {
+    margin: 0;
+    display: inline-block;
+    padding-top: 6px;
+}
+
+/* new */
+
+
+::-webkit-scrollbar {
+    width: 0px;
+    /* remove scrollbar space */
+    background: transparent;
+    /* optional: just make scrollbar invisible */
+  }
+  
+  .pull-right {
+    float: right;
+  }
+  
+  .white {
+    color: rgba(255, 255, 255, 0.95);
+  }
+  
+  #email-app {
+    max-width: 1170px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  #email-app .email-app__wrapper {
+    overflow: hidden;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.25);
+  }
+  #email-app .row {
+    width: 100%;
+    margin: 0 auto;
+    border-radius: 3px;
+  }
+  
+ .col-md-8{
+    height: 100%;
+    padding: 0;
+    display: block;
+    overflow-y: scroll;
+    position: relative;
+    max-height: 700px;
+    /* overflow-y: auto; */
+    height: 700px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: -10px 0px 30px 4px rgba(0, 0, 0, 0.25);
+  }
+
+  .email-list__wrapper {
+    height: 100%;
+    padding: 0;
+    display: block;
+    overflow-y: scroll;
+    position: relative;
+    max-height: 700px;
+    /* overflow-y: auto; */
+    height: 700px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: -10px 0px 30px 4px rgba(0, 0, 0, 0.25);
+    z-index: 1;
+  }
+  
+  .email-details__wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: -1px 0px 30px 4px rgba(0, 0, 0, 0.25);
+    z-index: 1;
+  }
+  .email-details__wrapper .email-details__container {
+    padding: 30px 20px 20px;
+  }
+  .email-details__wrapper .email-details__info {
+    margin-bottom: 5px;
+  }
+  .email-details__wrapper .email-details__info span {
+    color: #8c8c8c;
+    font-size: 0.9rem;
+    transition: 0.3s;
+  }
+  .email-details__wrapper .email-details__header {
+    padding-bottom: 10px;
+    margin-bottom: 50px;
+    position: relative;
+  }
+  .email-details__wrapper .email-details__header:before {
+    content: "";
+    width: calc(750px);
+    height: 1px;
+    background: #d2d2d2;
+    left: 0;
+    bottom: -5px;
+    position: absolute;
+  }
+  .email-details__wrapper .email-details__message {
+    color: #8c8c8c;
+    overflow-y:scroll;
+  }
+
+  .email-details__wrapper .email-details__buttons {
+    position: absolute;
+    right: -5px;
+    bottom: -20px;
+  }
+  .email-details__wrapper .email-details__mark {
+    position: relative;
+    display: inline-block;
+    padding: 0 5px;
+  }
+  .email-details__wrapper .email-details__mark span {
+    width: 35px;
+    cursor: pointer;
+    height: 35px;
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+    border: 1px solid #8c8c8c;
+    border-radius: 100%;
+    padding-top: 1px;
+    font-size: 20px;
+    color: #8c8c8c;
+    transition: 0.3s;
+  }
+
+  .email-details__wrapper .email-details__mark span:hover {
+    background: #8c8c8c;
+    color: #fff;
+  }
+  
+  .email-item {
+    position: relative;
+    padding: 12px 30px 10px;
+    transition: 0.3s;
+    cursor: pointer;
+  }
+  .email-item:hover, .email-item.active {
+    background: rgba(0, 123, 255, 0.09);
+  }
+
+  .email-item:hover {
+    background: rgb(142, 238, 233);
+  }
+
+  .email-item .email-item__time {
+    text-align: right;
+    top: 15px;
+    color: #8c8c8c;
+    font-size: 0.9rem;
+  }
+  .email-item .email-item__subject {
+    display: inline-block;
+    margin-bottom: 3px;
+  }
+  .email-item .email-item__name {
+    color: #8c8c8c;
+  }
+  .email-item .email-item__message p {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    color: #8c8c8c;
+  }
+  
+  .empty-container {
+    display: flex;
+    height: 100%;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    color: #8c8c8c;
+  }
+  .empty-container div {
+    text-transform: uppercase;
+  }
+
+  .float-container input {
+    border: none;
+    font-size: 16px;
+    outline: 0;
+    padding: 0px 0px 0px 0px;
+    margin-top : 16px;    
+    width: 100%;
+    transform-origin: bottom left;
+    transform: translate(0, 14px) scale(1); 
+    transition: all .1s ease-in-out; 
+    background-color: #f6f7f8
+  }
+  
+  .float-container label {
+    font-size: 20px;
+      position: absolute;
+      transform-origin: top left;
+      transform: translate(0, 4px) scale(0.75); 
+      transition: all .1s ease-in-out; 
+  }
+
+  .float-container.active label {
+    -webkit-transform: translate(0, 4px) scale(0.75);
+     transform: translate(0, 4px) scale(0.75);
+  }
+
+  .dot {
+    height: 10px;
+    width: 10px;
+    background-color: blue;
+    border-radius: 50%;
+    display: inline-block;
+}
