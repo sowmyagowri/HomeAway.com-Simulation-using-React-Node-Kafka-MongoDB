@@ -18,4 +18,4 @@ This was developed as a part of Lab 2 for CMPE 273 coursework at SJSU solely for
     - Kafka
 
   ### Data Storage
-    - MySQL
+    - MongoDB
