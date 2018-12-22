@@ -1,4 +1,4 @@
-# Lab 1 - HomeAway - Frontend
+# HomeAway - Frontend
 
 How to run HomeAway frontend?
   - Navigate to frontend directory in cmd
