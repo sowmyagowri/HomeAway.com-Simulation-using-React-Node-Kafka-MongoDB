@@ -8,5 +8,5 @@ How to run HomeAway backend?
   - Test API calls with Mocha using npm test
 
 How can I change port, if 3001 port is occupied?
-  - Open app.js file in the backend directory
-  - Change '3001' to currently available port number in line 13 (var port = 3001;)
+  - Open settings.js file in the config folder in the backend directory
+  - Change '3001' to currently available port number in line 11 ('backend_port': '3001')
