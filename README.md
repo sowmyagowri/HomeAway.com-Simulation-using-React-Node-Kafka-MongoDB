@@ -1,4 +1,5 @@
-# HomeAway-Lab1-CMPE-273
+# HomeAway
+This website was developed solely for educational purposes.
 
 ## How can I run HomeAway?
   - Run HomeAway back-end using instructions in ReadMe.md in backend directory
