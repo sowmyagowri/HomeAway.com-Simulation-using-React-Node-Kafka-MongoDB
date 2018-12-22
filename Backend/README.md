@@ -1,4 +1,4 @@
-# Lab 1 - HomeAway - Backend
+# HomeAway - Backend
 
 How to run HomeAway backend?
   - Navigate to backend directory in cmd
