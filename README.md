@@ -1,4 +1,4 @@
-# HomeAway
+# HomeAway.com Simulation
 This was developed as a part of Lab 2 for CMPE 273 coursework at SJSU solely for educational purposes.
 
 ## How can I run HomeAway?
